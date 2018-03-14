@@ -139,7 +139,7 @@ nav h1 a {
   letter-spacing: 0;
   margin: 5px 5px 0 0;
   padding: 0 5px;
-  width: calc((100% - 30px) / 2);
+  width: calc((100% - 10px) / 2);
 }
 .filter-options select:last-of-type {
   margin: 5px 0 0 5px;
