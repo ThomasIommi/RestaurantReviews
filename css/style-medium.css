@@ -1,0 +1,38 @@
+@charset "utf-8";
+/* CSS Document for media query min-width: 540px */
+
+nav h1 a {
+    color: #fff;
+    font-size: 26px;
+}
+/* Main page */
+#restaurants-list {
+    padding-left: 30px;
+    padding-right: 30px;
+    width: calc(100% - 60px);
+}
+#restaurants-list li {
+    width: calc(50% - 10px);
+}
+#restaurants-list li:nth-last-child(odd) {
+    border-radius: 0;
+    border-top-right-radius: 30px;
+    border-bottom-left-radius: 30px;
+}
+.filter-options h2 {
+    font-size: 1.5em;
+}
+/* Restaurant Details */
+#breadcrumb {
+    font-size: 20px;
+}
+#restaurant-name {
+    font-size: 24px;
+}
+#restaurant-cuisine {
+    font-size: 20px;
+}
+#restaurant-container, #reviews-container {
+    padding: 30px 30px 60px;
+    width: calc(100% - 60px);
+}
