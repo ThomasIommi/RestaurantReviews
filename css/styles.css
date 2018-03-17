@@ -58,11 +58,12 @@ footer {
 
 /* ====================== Navigation ====================== */
 nav {
-  width: 100%;
-  height: 80px;
+  width: calc(100% - 40px);
+  height: 75px;
   background-color: #252831;
   text-align:center;
   display: flex;
+  padding: 10px 20px;
 }
 nav h1 {
   margin: auto;
@@ -114,7 +115,7 @@ nav h1 a {
 /* ====================== Restaurant Filtering ====================== */
 .filter-options {
   width: calc(100% - 20px);
-  height: 60px;
+  height: 75px;
   background-color: #3397DB;
   align-items: center;
   display: flex;
@@ -150,7 +151,7 @@ nav h1 a {
   background-color: #f3f3f3;
   list-style: outside none none;
   margin: 0;
-  padding: 30px 15px 60px;
+  padding: 30px 20px 60px;
 }
 #restaurants-list li {
   background-color: #fff;
@@ -186,19 +187,22 @@ nav h1 a {
 }
 #restaurants-list p {
   margin: 0;
-  font-size: 11pt;
+  font-size: 16px;
 }
 #restaurants-list li a {
   background-color: orange;
   border-bottom: 3px solid #eee;
   color: #fff;
   display: inline-block;
-  font-size: 10pt;
-  margin: 15px 0 0;
+  font-size: 16px;
+  margin: 30px 0 0;
   padding: 8px 30px 10px;
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
+}
+#restaurants-list li .wrapper {
+  padding: 0 15px;
 }
 
 /* ====================== Restaurant Details ====================== */
@@ -209,7 +213,7 @@ nav h1 a {
   z-index: 1000;
 }
 .inside #map-container {
-  margin-top: 126px;
+  margin-top: 141px;
   width: 100%;
 }
 #restaurant-name {
@@ -218,16 +222,26 @@ nav h1 a {
   font-size: 20px;
   font-weight: 200;
   letter-spacing: 0;
-  margin: 15px 0 30px;
+  margin: 0 0 20px;
   text-transform: uppercase;
   line-height: 1.1;
 }
 #restaurant-img {
-  width: 90%;
+  width: 100%;
+}
+#restaurant-inner-container {
+  border: 1px solid #ccc;
+  box-shadow: 5px 5px 5px #aaa;
+  border-top-left-radius: 30px;
+  overflow: hidden;
+}
+#restaurant-inner-container .lower {
+  padding: 0 5px 5px;
 }
 #restaurant-address {
   font-size: 12pt;
   margin: 10px 0;
+  text-align: center;
 }
 #restaurant-cuisine {
   background-color: #333;
@@ -235,24 +249,42 @@ nav h1 a {
   font-size: 12pt;
   font-weight: 300;
   letter-spacing: 10px;
-  margin: 0 0 20px;
-  padding: 2px 0;
+  margin: -4px 0 20px;
   text-align: center;
   text-transform: uppercase;
-  width: 90%;
+  padding: 10px;
+  width: calc(100% - 20px);
 }
 #restaurant-container, #reviews-container {
   border-bottom: 1px solid #d9d9d9;
   border-top: 1px solid #fff;
-  padding: 20px 20px 30px;
-  width: 100%;
+  padding: 20px 20px 60px;
+  width: calc(100% - 40px);
 }
 #reviews-container h2 {
   color: #f58500;
-  font-size: 24pt;
+  font-size: 2em;
   font-weight: 300;
   letter-spacing: -1px;
   padding-bottom: 1pt;
+}
+#restaurant-hours td {
+  color: #666;
+  min-height: 55px;
+}
+#restaurant-hours td:last-of-type {
+  text-align: center;
+}
+#restaurant-hours {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+}
+#restaurant-hours th, td {
+  padding: 8px;
+}
+table, td, th {
+  border: 1px solid #ddd;
 }
 #reviews-list {
   margin: 0;
@@ -265,13 +297,49 @@ nav h1 a {
   list-style-type: none;
   margin: 0 0 30px;
   overflow: hidden;
-  padding: 0 20px 20px;
   position: relative;
-  width: 85%;
+  width: 100%;
+  border-top-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  box-shadow: 5px 5px 5px #aaa;
+  border: 1px solid #ccc;
 }
-#reviews-list li p {
-  margin: 0 0 10px;
+#reviews-list li .header {
+  display: flex;
+  justify-content: space-between;
+  color: #fff;
+  background-color: #444;
+  height: 60px;
+  padding: 10px 30px;
+  width: calc(100% - 60px);
 }
-#restaurant-hours td {
-  color: #666;
+#reviews-list li .header p {
+  margin: auto 0;
+  text-shadow: 2px 1px 2px #000;
 }
+#reviews-list li .header p:first-child {
+  color: #fff;
+  font-size: 24px;
+}
+#reviews-list li .header p:last-child {
+  color: #ccc;
+}
+#reviews-list li .rating {
+  max-width: 100px;
+  background-color: #ff9b08;
+  margin: 20px 15px 10px;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  text-transform: uppercase;
+  border-radius: 5px;
+}
+#reviews-list li .comment {
+  width: calc(100% - 40px);
+  margin: 0 15px 20px;
+  line-height: 1.5em;
+  font-size: 16px;
+  color: #333;
+}
+
+
