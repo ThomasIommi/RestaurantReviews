@@ -1,38 +1,52 @@
 @charset "utf-8";
 /* CSS Document for media query min-width: 540px */
 
+/* ====================== Navigation ====================== */
 nav h1 a {
-    color: #fff;
-    font-size: 26px;
+  color: #fff;
+  font-size: 26px;
 }
-/* Main page */
-#restaurants-list {
-    padding-left: 30px;
-    padding-right: 30px;
-    width: calc(100% - 60px);
+#breadcrumb li {
+  font-size: 18px;
 }
-#restaurants-list li {
-    width: calc(50% - 10px);
-}
-#restaurants-list li:nth-last-child(odd) {
-    border-radius: 0;
-    border-top-right-radius: 30px;
-    border-bottom-left-radius: 30px;
+
+/* ====================== Restaurant Filtering ====================== */
+.filter-options {
+  padding: 10px 20px;
+  width: calc(100% - 40px);
 }
 .filter-options h2 {
-    font-size: 1.5em;
+  font-size: 1.5em;
 }
-/* Restaurant Details */
-#breadcrumb {
-    font-size: 20px;
+
+/* ====================== Restaurant Listing ====================== */
+#restaurants-list {
+  padding-left: 30px;
+  padding-right: 30px;
+  width: calc(100% - 60px);
 }
+#restaurants-list li {
+  width: calc((100% - 19px) / 2);
+  margin-right: 15px;
+}
+#restaurants-list li:nth-child(2n) {
+  border-radius: 0;
+  border-top-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+  margin-right: 0;
+}
+
+/* ====================== Restaurant Details ====================== */
 #restaurant-name {
-    font-size: 24px;
+  font-size: 24px;
 }
 #restaurant-cuisine {
-    font-size: 20px;
+  font-size: 20px;
 }
 #restaurant-container, #reviews-container {
-    padding: 30px 30px 60px;
-    width: calc(100% - 60px);
+  padding: 30px 30px 60px;
+  width: calc(100% - 60px);
+}
+#reviews-list li .header p {
+  font-size: 18px;
 }

@@ -5,6 +5,9 @@
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" media="screen and (min-width: 540px)" href="css/style-medium.css">
+  <link rel="stylesheet" media="screen and (min-width: 720px)" href="css/style-large.css">
+  <link rel="stylesheet" media="screen and (min-width: 880px)" href="css/style-extralarge.css">
+  <link rel="stylesheet" media="screen and (min-width: 1300px)" href="css/style-huge.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="utf-8">
   <title>Restaurant Reviews</title>
@@ -24,12 +27,14 @@
     <section id="restaurant-list-container">
       <div class="filter-options">
         <h2>Filter Results</h2>
-        <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
-          <option value="all">All Neighborhoods</option>
-        </select>
-        <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()">
-          <option value="all">All Cuisines</option>
-        </select>
+        <div class="filter-selects">
+          <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
+            <option value="all">All Neighborhoods</option>
+          </select>
+          <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()">
+            <option value="all">All Cuisines</option>
+          </select>
+        </div>
       </div>
       <ul id="restaurants-list"></ul>
     </section>
