@@ -114,7 +114,11 @@ resetRestaurants = (restaurants) => {
   self.restaurants = [];
   const ul = document.getElementById('restaurants-list');
   ul.innerHTML = '';
-
+  // Remove 'No results found!' warning
+  const noResult = document.getElementById('no-results-warning');
+  if (noResult) {
+    noResult.remove();
+  }
   // Remove all map markers
   self.markers.forEach(m => m.setMap(null));
   self.markers = [];
@@ -126,8 +130,17 @@ resetRestaurants = (restaurants) => {
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById('restaurants-list');
+  // Add 'No results found!' in case of empty list
+  if (!restaurants.length) {
+    const container = document.getElementById('restaurant-list-container');
+    const noResults = document.createElement('p');
+    noResults.innerHTML = 'No results found!';
+    noResults.id = 'no-results-warning';
+    container.append(noResults);
+    return;
+  }
   restaurants.forEach(restaurant => {
-    ul.append(createRestaurantHTML(restaurant));
+      ul.append(createRestaurantHTML(restaurant));
   });
   addMarkersToMap();
 };
@@ -141,6 +154,7 @@ createRestaurantHTML = (restaurant) => {
   const image = document.createElement('img');
   image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.title = restaurant.name;
   li.append(image);
 
   const wrapper = document.createElement('div');
