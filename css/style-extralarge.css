@@ -31,7 +31,17 @@ nav h1 a {
   margin-right: 0;
 }
 
+/* ====================== Map ====================== */
+.inside #map-container {
+  padding-left: 30px;
+  width: calc(50% - 50px);
+}
+
 /* ====================== Restaurant Details ====================== */
+#restaurant-container {
+  padding-right: 30px;
+  width: calc(50% - 50px);
+}
 #reviews-list {
   display: flex;
   flex-wrap: wrap;
