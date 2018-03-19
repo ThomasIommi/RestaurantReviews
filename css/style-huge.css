@@ -3,7 +3,7 @@
 
 /* ====================== Navigation ====================== */
 nav h1 a {
-  font-size: 35px;
+  font-size: 60px;
 }
 
 /* ====================== Restaurant Filtering ====================== */
@@ -21,7 +21,7 @@ nav h1 a {
 .filter-options select {
   padding: 10px;
   height: 55px;
-  font-size: 18px;
+  font-size: 22px;
 }
 
 /* ====================== Restaurant Listing ====================== */

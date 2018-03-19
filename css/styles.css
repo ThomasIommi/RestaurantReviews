@@ -1,6 +1,9 @@
 @charset "utf-8";
 /* CSS Document */
 
+/* ====================== Fonts ====================== */
+@import url('https://fonts.googleapis.com/css?family=Berkshire+Swash|Great+Vibes');
+
 /* ====================== Max-width Catch Up ====================== */
 img, embed, object, video {
   max-width: 100%;
@@ -70,10 +73,10 @@ nav h1 {
 }
 nav h1 a {
   color: #fff;
-  font-size: 18px;
-  font-weight: 200;
-  letter-spacing: 10px;
-  text-transform: uppercase;
+  font-size: 35px;
+  font-weight: 400;
+  letter-spacing: 5px;
+  font-family: 'Great Vibes', cursive;
 }
 #breadcrumb {
   padding: 15px 20px 15px;
@@ -130,12 +133,13 @@ nav h1 a {
 }
 .filter-options h2 {
   color: white;
-  font-size: 1em;
+  font-size: 1.2em;
   font-weight: normal;
   line-height: 1;
   margin: 0;
   width: 100%;
   padding-top: 5px;
+  font-family: 'Berkshire Swash', cursive;
 }
 .filter-selects {
   width: 100%;
@@ -145,7 +149,7 @@ nav h1 a {
 .filter-selects select {
   background-color: white;
   border: 1px solid #fff;
-  font-family: Arial,sans-serif;
+  font-family: Arial, sans-serif;
   font-size: 11pt;
   height: 35px;
   letter-spacing: 0;
@@ -221,6 +225,12 @@ nav h1 a {
 #restaurant-list-container {
   width: 100%;
 }
+#no-results-warning {
+  margin: -40px 0 0;
+  padding-bottom: 40px;
+  text-align: center;
+  font-size: 20px;
+}
 
 /* ====================== Restaurant Details ====================== */
 .inside header {
@@ -237,7 +247,6 @@ nav h1 a {
   letter-spacing: 0;
   margin: 0 0 20px;
   text-transform: uppercase;
-  line-height: 1.1;
 }
 #restaurant-img {
   width: 100%;
@@ -280,6 +289,7 @@ nav h1 a {
 }
 #reviews-container h2 {
   color: #f58500;
+  font-family: 'Berkshire Swash', cursive;
   font-size: 2em;
   font-weight: 300;
   letter-spacing: -1px;
@@ -357,5 +367,6 @@ table, td, th {
   font-size: 16px;
   color: #333;
 }
+
 
 
