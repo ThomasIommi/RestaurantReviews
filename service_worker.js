@@ -61,9 +61,10 @@ self.addEventListener('activate', (event) => {
 function handleRestaurantDetails(request) {
   const requestURL = new URL(request.url);
   const urlNoParams = requestURL.origin+requestURL.pathname;
-  // Try to handle offline request to specific restaurant details from cache
+  // Handle offline request to specific restaurant details from cache
+  // (it gets the parameters anyway from the url of the request, that does not change)
   if (urlNoParams === location.origin+'/restaurant.html') {
-    return fetch(urlNoParams)
+    return fetch(urlNoParams);
   }
   return fetch(request);
 }
