@@ -7,16 +7,13 @@ nav h1 a {
 }
 
 /* ====================== Restaurant Filtering ====================== */
-.filter-options h2 {
-  width: 25%;
-}
-.filter-selects {
-  width: 75%;
-}
 .filter-options select {
   padding: 8px;
   height: 45px;
   font-size: 16px;
+}
+#glass {
+  display: inline;
 }
 
 /* ====================== Restaurant Listing ====================== */

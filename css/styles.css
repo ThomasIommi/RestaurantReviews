@@ -160,6 +160,9 @@ nav h1 a {
 .filter-selects select:last-of-type {
   margin: 5px 0 0 5px;
 }
+#glass {
+  display: none;
+}
 
 /* ====================== Restaurant Listing ====================== */
 #restaurants-list {
