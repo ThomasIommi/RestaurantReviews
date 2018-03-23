@@ -56,7 +56,7 @@ self.addEventListener('activate', (event) => {
 });
 
 /**
- * Function that detect and trys to handle the restaurant details
+ * Function that detect and trys to handle the restaurant details.
   */
 function handleRestaurantDetails(request) {
   const requestURL = new URL(request.url);
@@ -74,6 +74,7 @@ self.addEventListener('fetch', (event) => {
   // Respond from cache if there is the requested resource
   event.respondWith(
     caches.match(event.request).then((response) => {
+      // Could set {ignoreSearch: true}, but it seemed slower...
       return response || handleRestaurantDetails(event.request);
     })
   );
