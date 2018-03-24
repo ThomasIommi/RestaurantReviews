@@ -6,28 +6,30 @@ const appCacheName = staticName+version;
 self.addEventListener('install', (event) => {
   // Array of requests to cache
   const urlsToCache = [
-      'https://fonts.googleapis.com/css?family=Berkshire+Swash|Great+Vibes',
-      '/',
-      '/restaurant.html',
-      'css/styles.css',
-      'css/style-medium.css',
-      'css/style-large.css',
-      'css/style-extralarge.css',
-      'css/style-huge.css',
-      'js/dbhelper.js',
-      'js/main.js',
-      'js/restaurant_info.js',
-      'data/restaurants.json',
-      'img/1.jpg',
-      'img/2.jpg',
-      'img/3.jpg',
-      'img/4.jpg',
-      'img/5.jpg',
-      'img/6.jpg',
-      'img/7.jpg',
-      'img/8.jpg',
-      'img/9.jpg',
-      'img/10.jpg',
+    'https://fonts.googleapis.com/css?family=Berkshire+Swash|Great+Vibes',
+    'https://fonts.gstatic.com/s/berkshireswash/v6/ptRRTi-cavZOGqCvnNJDl5m5XmN_qs4zT305QQ.woff2',
+    'https://fonts.gstatic.com/s/greatvibes/v5/RWmMoKWR9v4ksMfaWd_JN9XFiaQoDmlr.woff2',
+    '/',
+    '/restaurant.html',
+    'css/styles.css',
+    'css/style-medium.css',
+    'css/style-large.css',
+    'css/style-extralarge.css',
+    'css/style-huge.css',
+    'js/dbhelper.js',
+    'js/main.js',
+    'js/restaurant_info.js',
+    'data/restaurants.json',
+    'img/1.jpg',
+    'img/2.jpg',
+    'img/3.jpg',
+    'img/4.jpg',
+    'img/5.jpg',
+    'img/6.jpg',
+    'img/7.jpg',
+    'img/8.jpg',
+    'img/9.jpg',
+    'img/10.jpg',
   ];
   // Cache needed resources
   event.waitUntil(
@@ -57,7 +59,7 @@ self.addEventListener('activate', (event) => {
 
 /**
  * Function that detect and trys to handle the restaurant details.
-  */
+ */
 function handleRestaurantDetails(request) {
   const requestURL = new URL(request.url);
   const urlNoParams = requestURL.origin+requestURL.pathname;
