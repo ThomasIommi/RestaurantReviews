@@ -6,9 +6,12 @@ main {
   display: flex;
   flex-wrap: wrap;
 }
+.inside main {
+  margin-top: 181px;
+}
 
 /* ====================== Navigation ====================== */
-nav {
+nav h1 {
   height: 100px;
 }
 nav h1 a {
@@ -27,7 +30,6 @@ footer {
 
 /* ====================== Map ====================== */
 .inside #map-container {
-  margin-top: 181px;
   border-bottom: 1px solid #d9d9d9;
   padding: 20px 20px 15px;
   width: calc(50% - 40px);
@@ -55,16 +57,7 @@ footer {
 #restaurant-container {
   padding: 20px 20px 15px;
   width: calc(50% - 40px);
-  margin-top: 181px;
   border-top: 0;
-}
-#restaurant-inner-container .lower {
-  padding: 0 10px 10px;
-}
-#restaurant-name {
-  font-size: 30px;
-  font-weight: bold;
-  font-spacing: 3px;
 }
 #restaurant-cuisine {
   margin-bottom: 0;
@@ -75,4 +68,11 @@ footer {
 }
 #restaurant-hours th, td {
   padding: 12px;
+}
+
+/* ====================== Focus Handling ====================== */
+/* Workaround for internal link and fixed nav-bar */
+#restaurant-container:target {
+  padding-top: 206px;
+  margin-top: -186px;
 }

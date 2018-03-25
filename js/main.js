@@ -121,10 +121,15 @@ resetRestaurants = (restaurants) => {
   self.restaurants = [];
   const ul = document.getElementById('restaurants-list');
   ul.innerHTML = '';
-  // Remove 'No results found!' warning
+  ul.style.display = 'none';
+  // Remove 'No results found!' warning and results counter;
   const noResult = document.getElementById('no-results-warning');
   if (noResult) {
     noResult.remove();
+  }
+  const resultsCounter = document.getElementById('results-counter');
+  if (resultsCounter) {
+    resultsCounter.remove();
   }
   // Remove all map markers
   self.markers.forEach(m => m.setMap(null));
@@ -137,19 +142,27 @@ resetRestaurants = (restaurants) => {
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById('restaurants-list');
+  const container = document.getElementById('restaurant-list-container');
   // Add 'No results found!' in case of empty list
   if (!restaurants.length) {
-    const container = document.getElementById('restaurant-list-container');
     const noResults = document.createElement('p');
     noResults.innerHTML = 'No results found!';
     noResults.id = 'no-results-warning';
+    noResults.setAttribute('aria-live', 'polite');
     container.append(noResults);
-    return;
+  } else {
+    restaurants.forEach(restaurant => {
+      ul.append(createRestaurantHTML(restaurant));
+    });
+    // Show list and result counter
+    ul.style.display = 'flex';
+    const resultsCounter = document.createElement('p');
+    resultsCounter.innerHTML = `${restaurants.length} ${restaurants.length === 1 ? 'result' : 'results'} found!`;
+    resultsCounter.id = 'results-counter';
+    resultsCounter.setAttribute('aria-live', 'polite');
+    container.append(resultsCounter);
+    addMarkersToMap();
   }
-  restaurants.forEach(restaurant => {
-    ul.append(createRestaurantHTML(restaurant));
-  });
-  addMarkersToMap();
 };
 
 /**
@@ -167,7 +180,7 @@ createRestaurantHTML = (restaurant) => {
 
   const wrapper = document.createElement('div');
   wrapper.className = 'wrapper';
-  const name = document.createElement('h1');
+  const name = document.createElement('h3');
   name.innerHTML = restaurant.name;
   wrapper.append(name);
 
@@ -183,6 +196,7 @@ createRestaurantHTML = (restaurant) => {
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
   more.href = DBHelper.urlForRestaurant(restaurant);
+  more.setAttribute('aria-label', `View details of the ${restaurant.name} restaurant`);
   li.append(more);
 
   return li
@@ -201,3 +215,5 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     self.markers.push(marker);
   });
 };
+
+

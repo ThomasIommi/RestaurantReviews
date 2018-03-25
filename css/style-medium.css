@@ -36,9 +36,6 @@ nav h1 a {
 }
 
 /* ====================== Restaurant Details ====================== */
-#restaurant-name {
-  font-size: 24px;
-}
 #restaurant-cuisine {
   font-size: 20px;
 }
@@ -48,4 +45,8 @@ nav h1 a {
 }
 #reviews-list li .header p {
   font-size: 18px;
+}
+#restaurant-inner-container .lower {
+  padding: 0 10px 10px;
+  width: calc(100% - 20px);
 }

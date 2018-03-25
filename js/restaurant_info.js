@@ -132,7 +132,8 @@ createReviewHTML = (review) => {
   li.appendChild(header);
 
   const rating = document.createElement('p');
-  rating.innerHTML = `Rating: ${review.rating}★`;
+  const starLabel = review.rating === 1 ? 'star' : 'stars';
+  rating.innerHTML = `Rating: ${review.rating}<span role="img" aria-label="${starLabel}">★</span>`;
   rating.className = 'rating';
   li.appendChild(rating);
 

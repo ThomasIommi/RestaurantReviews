@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
@@ -8,6 +8,7 @@
   <link rel="stylesheet" media="screen and (min-width: 720px)" href="css/style-large.css">
   <link rel="stylesheet" media="screen and (min-width: 880px)" href="css/style-extralarge.css">
   <link rel="stylesheet" media="screen and (min-width: 1300px)" href="css/style-huge.css">
+  <link rel="icon" href="img/favicon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="utf-8">
   <title>Restaurant Reviews</title>
@@ -15,6 +16,7 @@
 
 <body>
   <header>
+    <a href="#restaurant-list-container" class="skip-map">Skip to content</a>
     <nav>
       <h1><a href="/" title="Restaurant Reviews">Restaurant Reviews</a></h1>
     </nav>
@@ -22,16 +24,18 @@
 
   <main id="maincontent">
     <section id="map-container">
-      <div id="map"></div>
+      <div id="map" aria-label="Google Maps container"></div>
     </section>
-    <section id="restaurant-list-container">
+    <section id="restaurant-list-container" tabindex="-1">
       <div class="filter-options">
-        <h2>Filter Results <span id="glass">🔎</span></h2>
+        <h2>Filter Results <span id="glass" role="img" aria-label="">🔎</span></h2>
         <div class="filter-selects">
-          <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
+          <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()"
+                  aria-label="filter by neighborhood" aria-controls="restaurants-list">
             <option value="all">All Neighborhoods</option>
           </select>
-          <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()">
+          <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()"
+                  aria-label="filter by cuisine" aria-controls="restaurants-list">
             <option value="all">All Cuisines</option>
           </select>
         </div>
