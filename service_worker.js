@@ -4,11 +4,8 @@ const appCacheName = staticName+version;
 
 // Install service worker
 self.addEventListener('install', (event) => {
-  // Array of requests to cache
-  const urlsToCache = [
-    'https://fonts.googleapis.com/css?family=Berkshire+Swash|Great+Vibes',
-    'https://fonts.gstatic.com/s/berkshireswash/v6/ptRRTi-cavZOGqCvnNJDl5m5XmN_qs4zT305QQ.woff2',
-    'https://fonts.gstatic.com/s/greatvibes/v5/RWmMoKWR9v4ksMfaWd_JN9XFiaQoDmlr.woff2',
+  // Array of requests from server to cache
+  const urlsFromApp = [
     '/',
     '/restaurant.html',
     'css/styles.css',
@@ -32,11 +29,31 @@ self.addEventListener('install', (event) => {
     'img/10.jpg',
     'img/favicon.ico' // from FreeFavicon.com
   ];
+  // Arrays of request from web to cache (might fail)
+  const urlsFromNet = [
+    'https://fonts.googleapis.com/css?family=Berkshire+Swash|Great+Vibes',
+    'https://fonts.gstatic.com/s/greatvibes/v5/RWmMoKWR9v4ksMfaWd_JN9XFiaQ.woff2',
+    'https://fonts.gstatic.com/s/berkshireswash/v6/ptRRTi-cavZOGqCvnNJDl5m5XmN_qs4z.woff2',
+  ];
+  // Google Map request (CORS problem)
+  const urlGMap = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBFwGq-5iMAMkyT0ZocrJUant2pL0aPVrE&libraries=places&callback=initMap';
   // Cache needed resources
   event.waitUntil(
     caches.open(appCacheName).then((cache) => {
-      return cache.addAll(urlsToCache).catch((err) => {
-        console.log("An error occurred during the installation of the service worker: " + err);
+      // Fetch net for Google Maps and cache it
+      fetch(urlGMap, {mode : "no-cors"}).then((response) => {
+        return cache.put(urlGMap, response.clone())
+      }).catch((err) => {
+        console.warn('Failed to cache Google Maps API!', err);
+      });
+      // Install as not a dependency, from Jake Archibald - Offline Cookbook
+      // https://jakearchibald.com/2014/offline-cookbook/#on-install-not-as-a-dependency
+      cache.addAll(urlsFromNet).catch((err) => {
+        console.warn('Failed to cache fonts!', err);
+      });
+      // Core dependencies
+      return cache.addAll(urlsFromApp).catch((err) => {
+        console.error("An error occurred during the installation of the service worker: ", err);
       });
     })
   );
@@ -58,27 +75,18 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-/**
- * Function that detect and trys to handle the restaurant details.
- */
-function handleRestaurantDetails(request) {
-  const requestURL = new URL(request.url);
-  const urlNoParams = requestURL.origin+requestURL.pathname;
-  // Handle offline request to specific restaurant details from cache
-  // (it gets the parameters anyway from the url of the request, that does not change)
-  if (urlNoParams === location.origin+'/restaurant.html') {
-    return fetch(urlNoParams);
-  }
-  return fetch(request);
-}
+self.addEventListener('fetch', function(event) {
+  const requestURL = new URL(event.request.url);
 
-// Intercept requests and check if they are cached
-self.addEventListener('fetch', (event) => {
-  // Respond from cache if there is the requested resource
+  // Detect and trys to handle the restaurant details.
+  if (requestURL.origin === location.origin && requestURL.pathname === '/restaurant.html') {
+    event.respondWith(caches.match('/restaurant.html'));
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      // Could set {ignoreSearch: true}, but it seemed slower...
-      return response || handleRestaurantDetails(event.request);
+    caches.match(event.request).then(function(response) {
+      return response || fetch(event.request);
     })
   );
 });
