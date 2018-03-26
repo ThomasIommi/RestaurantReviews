@@ -18,20 +18,20 @@
 <body class="inside">
   <header>
     <a href="#restaurant-container" class="skip-map">Skip to content</a>
-    <nav>
-      <h1><a href="/" title="Restaurant Reviews">Restaurant Reviews</a></h1>
-      <ul id="breadcrumb" >
+    <h1><a href="/" title="Restaurant Reviews">Restaurant Reviews</a></h1>
+    <nav aria-label="Breadcrumb">
+      <ol id="breadcrumb" >
         <li><a href="/">Home</a></li>
-      </ul>
+      </ol>
     </nav>
   </header>
 
   <main id="maincontent">
     <section id="map-container">
-      <div id="map" aria-label="Google Maps container"></div>
+      <div id="map" aria-label="Google Maps container" role="application"></div>
     </section>
     <section id="restaurant-container" tabindex="-1">
-      <h1 id="restaurant-name"></h1>
+      <h2 id="restaurant-name"></h2>
       <div id="restaurant-inner-container">
         <div class="upper">
           <img id="restaurant-img">
@@ -39,7 +39,9 @@
         </div>
         <div class="lower">
           <p id="restaurant-address"></p>
-          <table id="restaurant-hours"></table>
+          <table id="restaurant-hours">
+            <caption>Timetable</caption>
+          </table>
         </div>
       </div>
     </section>

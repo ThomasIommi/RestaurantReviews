@@ -62,8 +62,8 @@ footer {
   width: calc(100% - 50px);
 }
 
-/* ====================== Navigation ====================== */
-nav h1 {
+/* ====================== Header and Navigation ====================== */
+header h1 {
   width: calc(100% - 40px);
   height: 75px;
   background-color: #252831;
@@ -71,10 +71,10 @@ nav h1 {
   display: flex;
   padding: 10px 20px;
 }
-nav h1 {
+header h1 {
   margin: auto;
 }
-nav h1 a {
+header h1 a {
   color: #fff;
   font-size: 35px;
   font-weight: 400;
