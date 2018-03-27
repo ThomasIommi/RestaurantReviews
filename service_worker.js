@@ -31,9 +31,10 @@ self.addEventListener('install', (event) => {
   ];
   // Arrays of request from web to cache (might fail)
   const urlsFromNet = [
-    'https://fonts.googleapis.com/css?family=Berkshire+Swash|Great+Vibes',
-    'https://fonts.gstatic.com/s/greatvibes/v5/RWmMoKWR9v4ksMfaWd_JN9XFiaQ.woff2',
-    'https://fonts.gstatic.com/s/berkshireswash/v6/ptRRTi-cavZOGqCvnNJDl5m5XmN_qs4z.woff2',
+    'https://fonts.gstatic.com/s/berkshireswash/v6/ptRRTi-cavZOGqCvnNJDl5m5XmN_pM4zT305QaYc.woff2', // Fonts from Google Fonts
+    'https://fonts.gstatic.com/s/berkshireswash/v6/ptRRTi-cavZOGqCvnNJDl5m5XmN_qs4zT305QQ.woff2',
+    'https://fonts.gstatic.com/s/greatvibes/v5/RWmMoKWR9v4ksMfaWd_JN9XLiaQoDmlrMlY.woff2',
+    'https://fonts.gstatic.com/s/greatvibes/v5/RWmMoKWR9v4ksMfaWd_JN9XFiaQoDmlr.woff2',
   ];
   // Google Map request (CORS problem)
   const urlGMap = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBFwGq-5iMAMkyT0ZocrJUant2pL0aPVrE&libraries=places&callback=initMap';
@@ -41,8 +42,9 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(appCacheName).then((cache) => {
       // Fetch net for Google Maps and cache it
+      // (no need to clone the response if I don't return it)
       fetch(urlGMap, {mode : "no-cors"}).then((response) => {
-        return cache.put(urlGMap, response.clone())
+        return cache.put(urlGMap, response)
       }).catch((err) => {
         console.warn('Failed to cache Google Maps API!', err);
       });
