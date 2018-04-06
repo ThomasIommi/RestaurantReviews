@@ -1,0 +1,58 @@
+@charset "utf-8";
+/* CSS Document for media query min-width: 880px */
+
+/* ====================== Header and Navigation ====================== */
+header h1 a {
+  font-size: 55px;
+}
+
+/* ====================== Restaurant Filtering ====================== */
+.filter-options select {
+  padding: 8px;
+  height: 45px;
+  font-size: 16px;
+}
+#glass {
+  display: inline;
+}
+
+/* ====================== Restaurant Listing ====================== */
+#restaurants-list li {
+  width: calc((100% - 46px) / 3);
+  margin-right: 20px;
+}
+#restaurants-list li:nth-child(even) {
+  margin-right: 20px;
+}
+#restaurants-list li:nth-child(3n) {
+  margin-right: 0;
+}
+
+/* ====================== Map ====================== */
+.inside #map-container {
+  padding-left: 30px;
+  width: calc(50% - 50px);
+}
+
+/* ====================== Restaurant Details ====================== */
+#restaurant-container {
+  padding-right: 30px;
+  width: calc(50% - 50px);
+}
+#reviews-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+#reviews-list li {
+  width: calc(50% - 8px);
+  margin-right: 15px;
+}
+#reviews-list li:nth-child(even) {
+  border-radius: 0;
+  border-top-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+  margin-right: 0;
+}
+#reviews-list li .header p {
+  font-size: 20px;
+}

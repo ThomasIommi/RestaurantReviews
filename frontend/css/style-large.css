@@ -1,0 +1,78 @@
+@charset "utf-8";
+/* CSS Document for media query min-width: 720px */
+
+/* ====================== Basic Page Elements ====================== */
+main {
+  display: flex;
+  flex-wrap: wrap;
+}
+.inside main {
+  margin-top: 181px;
+}
+
+/* ====================== Header and Navigation ====================== */
+header h1 {
+  height: 100px;
+}
+header h1 a {
+  font-size: 50px;
+}
+#breadcrumb {
+  height: 35px;
+}
+#breadcrumb li {
+  font-size: 20px;
+  line-height: 35px;
+}
+footer {
+  font-size: 14px;
+}
+
+/* ====================== Map ====================== */
+.inside #map-container {
+  border-bottom: 1px solid #d9d9d9;
+  padding: 20px 20px 15px;
+  width: calc(50% - 40px);
+}
+.inside #map {
+  height: 100%;
+  box-shadow: 5px 5px 5px #aaa;
+  border: 1px solid #ccc;
+}
+
+/* ====================== Restaurant Filtering ====================== */
+.filter-options h2 {
+  font-size: 2em;
+  width: 30%;
+  text-align: center;
+}
+.filter-selects {
+  width: 70%;
+}
+#no-results-warning {
+  font-size: 30px;
+}
+
+/* ====================== Restaurant Details ====================== */
+#restaurant-container {
+  padding: 20px 20px 15px;
+  width: calc(50% - 40px);
+  border-top: 0;
+}
+#restaurant-cuisine {
+  margin-bottom: 0;
+}
+#restaurant-inner-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+#restaurant-hours th, td {
+  padding: 12px;
+}
+
+/* ====================== Focus Handling ====================== */
+/* Workaround for internal link and fixed nav-bar */
+#restaurant-container:target {
+  padding-top: 206px;
+  margin-top: -186px;
+}
