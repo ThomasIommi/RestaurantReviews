@@ -12,14 +12,14 @@ const del = require('del');
 
 // live editing script, sets watchers and browsersync
 gulp.task('default', ['dev'], () => {
-  gulp.watch('frontend/src/sass/**/*.scss', ['compile-scss'])
+  gulp.watch('src/sass/**/*.scss', ['compile-scss'])
     .on('change', browserSync.reload);
-  gulp.watch('frontend/src/*.html', ['copy-html'])
+  gulp.watch('src/*.html', ['copy-html'])
     .on('change', browserSync.reload);
-  gulp.watch('frontend/src/**/*.js', ['copy-js'])
+  gulp.watch('src/**/*.js', ['copy-js'])
     .on('change', browserSync.reload);
   browserSync.init({
-    server: 'frontend/dist/',
+    server: 'dist/',
     port: 8000
   });
   browserSync.stream();
@@ -28,62 +28,62 @@ gulp.task('default', ['dev'], () => {
 // compiles sass style files and insert vendor prefixes automatically
 // with autoprefixer
 gulp.task('compile-scss', () => {
-  gulp.src('frontend/src/sass/**/*.scss')
+  gulp.src('src/sass/**/*.scss')
     .pipe(sass({outputStyle: 'compressed'})
       .on('error', sass.logError))
     .pipe(autoprefixer({
       browsers: ['last 2 versions']
     }))
-    .pipe(gulp.dest('./frontend/dist/css/'));
+    .pipe(gulp.dest('./dist/css/'));
 });
 
 // simply copies html files into dist folder
 gulp.task('copy-html', () => {
-  gulp.src('frontend/src/*.html')
-    .pipe(gulp.dest('./frontend/dist/'));
+  gulp.src('src/*.html')
+    .pipe(gulp.dest('./dist/'));
 });
 
 // simply copies js files into dist folder
 gulp.task('copy-js', ['browserify-idb'], () => {
-  gulp.src(['frontend/src/**/*.js', '!frontend/src/js/ES6_imports/*.js'])
-    .pipe(gulp.dest('./frontend/dist/'));
+  gulp.src(['src/**/*.js', '!src/js/ES6_imports/*.js'])
+    .pipe(gulp.dest('./dist/'));
 });
 
 // simply copies img favicon file into dist folder
 gulp.task('copy-favicon', () => {
-  gulp.src('frontend/resources/img/favicon.ico')
-  .pipe(gulp.dest('./frontend/dist/img/'));
+  gulp.src('resources/img/favicon.ico')
+  .pipe(gulp.dest('./dist/img/'));
 });
 
 // minifies all js files keeping trace of their structure with sourcemaps
 gulp.task('uglify', ['browserify-idb'], () => {
-  gulp.src(['frontend/src/**/*.js', '!frontend/src/js/ES6_imports/*.js'])
+  gulp.src(['src/**/*.js', '!src/js/ES6_imports/*.js'])
   .pipe(sourcemaps.init())
   .pipe(uglify())
   .pipe(sourcemaps.write())
-  .pipe(gulp.dest('./frontend/dist/'));
+  .pipe(gulp.dest('./dist/'));
 });
 
 // handles ES6 imports for the use of IDB promised library (browserify+babelify)
 gulp.task('browserify-idb', () => {
     return browserify({
-      entries: './frontend/src/js/ES6_imports/idb.js',
+      entries: './src/js/ES6_imports/idb.js',
       debug: true
     })
     .transform(babelify, {presets: ['env']})
     .bundle()
     .pipe(source('idb.bfy.js'))
-    .pipe(gulp.dest('./frontend/src/js'));
+    .pipe(gulp.dest('./src/js'));
 });
 
 // deletes dist folder
 gulp.task('clean-dist', () => {
-  return del('frontend/dist/**', {force:true});
+  return del('dist/**', {force:true});
 });
 
 // deletes browserified files
 gulp.task('clean-browserified', () => {
-  return del('frontend/src/js/**/*.bfy.js', {force:true});
+  return del('src/js/**/*.bfy.js', {force:true});
 });
 
 // set of tasks for development environment
