@@ -6,12 +6,12 @@ const appCacheName = staticName+version;
 self.addEventListener('install', (event) => {
   // Array of requests from server to cache
   const urlsFromApp = [
-    '/',
-    '/restaurant.html',
+    'index.html',
+    'restaurant.html',
     'css/styles.css',
     'css/style-medium.css',
     'css/style-large.css',
-    'css/style-extralarge.css',
+    'css/style-extralargea.css',
     'css/style-huge.css',
     'js/dbhelper.js',
     'js/main.js',

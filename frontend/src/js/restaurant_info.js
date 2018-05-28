@@ -5,7 +5,7 @@ var map;
  * Register service worker
  */
 if (navigator.serviceWorker) {
-  navigator.serviceWorker.register('/service_worker.js');
+  navigator.serviceWorker.register('service_worker.js');
 }
 
 /**
@@ -159,7 +159,7 @@ fillBreadcrumb = (restaurant=self.restaurant) => {
   const breadcrumb = document.getElementById('breadcrumb');
   const li = document.createElement('li');
   const a = document.createElement('a');
-  a.href = '/restaurant.html?id=' + restaurant.id;
+  a.href = './restaurant.html?id=' + restaurant.id;
   a.setAttribute('aria-current', 'page');
   a.innerHTML = restaurant.name;
   li.appendChild(a);

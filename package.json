@@ -1,0 +1,42 @@
+{
+  "name": "RestaurantReviews",
+  "version": "1.0.0",
+  "description": "**Restaurant Reviews** is a project realized for the \"Mobile Web Specialist Certification Course\" held by Udacity and Google; it is divided into 3 stages. The goal of the project it's to incrementally convert a static webpage to a mobile-ready web application.",
+  "main": "index.js",
+  "babel": {
+    "presets": [
+      "env"
+    ]
+  },
+  "dependencies": {
+    "idb": "^2.1.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "babelify": "^8.0.0",
+    "browserify": "^16.2.2",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^5.0.0",
+    "gulp-sass": "^4.0.1",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-uglify-es": "^1.0.4",
+    "run-sequence": "^2.2.1",
+    "vinyl-source-stream": "^2.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThomasIommi/RestaurantReviews.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ThomasIommi/RestaurantReviews/issues"
+  },
+  "homepage": "https://github.com/ThomasIommi/RestaurantReviews#readme"
+}
