@@ -1,5 +1,5 @@
 const staticName = 'restaurant-reviews-cache-v';
-const version = 1;
+const version = 2;
 const appCacheName = staticName+version;
 
 // Install service worker
@@ -11,12 +11,11 @@ self.addEventListener('install', (event) => {
     'css/styles.css',
     'css/style-medium.css',
     'css/style-large.css',
-    'css/style-extralargea.css',
+    'css/style-extralarge.css',
     'css/style-huge.css',
     'js/dbhelper.js',
     'js/main.js',
     'js/restaurant_info.js',
-    'data/restaurants.json',
     'img/1.jpg',
     'img/2.jpg',
     'img/3.jpg',

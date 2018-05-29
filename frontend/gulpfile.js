@@ -49,19 +49,20 @@ gulp.task('copy-js', ['browserify-idb'], () => {
     .pipe(gulp.dest('./dist/'));
 });
 
-// simply copies img favicon file into dist folder
-gulp.task('copy-favicon', () => {
-  gulp.src('resources/img/favicon.ico')
+// simply copies img files into dist folder
+gulp.task('copy-imgs', () => {
+  gulp.src('resources/img/**')
   .pipe(gulp.dest('./dist/img/'));
 });
 
 // minifies all js files keeping trace of their structure with sourcemaps
+// in a specific folder named 'sourcemaps' that is required only in debugging
 gulp.task('uglify', ['browserify-idb'], () => {
   gulp.src(['src/**/*.js', '!src/js/ES6_imports/*.js'])
   .pipe(sourcemaps.init())
   .pipe(uglify())
-  .pipe(sourcemaps.write())
-  .pipe(gulp.dest('./dist/'));
+  .pipe(sourcemaps.write('sourcemaps/'))
+  .pipe(gulp.dest('dist/'));
 });
 
 // handles ES6 imports for the use of IDB promised library (browserify+babelify)
@@ -90,7 +91,7 @@ gulp.task('clean-browserified', () => {
 gulp.task('dev', (callback) => {
   runSequence(
     ['clean-dist', 'clean-browserified'],
-    ['compile-scss', 'copy-html', 'copy-favicon', 'copy-js'],
+    ['compile-scss', 'copy-html', 'copy-imgs', 'copy-js'],
     callback);
 });
 
@@ -98,6 +99,6 @@ gulp.task('dev', (callback) => {
 gulp.task('prod', (callback) => {
   runSequence(
     ['clean-dist', 'clean-browserified'],
-    ['compile-scss', 'copy-html', 'copy-favicon', 'uglify'],
+    ['compile-scss', 'copy-html', 'copy-imgs', 'uglify'],
     callback);
 });
