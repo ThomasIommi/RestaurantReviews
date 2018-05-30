@@ -1,21 +1,24 @@
+import idb from 'idb';
+
 const staticName = 'restaurant-reviews-cache-v';
-const version = 2;
+const version = 1;
 const appCacheName = staticName+version;
+const serverREST = 'http://localhost:1337';
+let dbPromise;
 
 // Install service worker
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
   // Array of requests from server to cache
   const urlsFromApp = [
-    'index.html',
-    'restaurant.html',
+    '/',
+    '/restaurant.html',
     'css/styles.css',
-    'css/style-medium.css',
-    'css/style-large.css',
-    'css/style-extralarge.css',
-    'css/style-huge.css',
-    'js/dbhelper.js',
-    'js/main.js',
-    'js/restaurant_info.js',
+    'css/style_medium.css',
+    'css/style_large.css',
+    'css/style_extralarge.css',
+    'css/style_huge.css',
+    'js/bundles/main_bundle.js',
+    'js/bundles/restaurant_bundle.js',
     'img/1.jpg',
     'img/2.jpg',
     'img/3.jpg',
@@ -39,29 +42,60 @@ self.addEventListener('install', (event) => {
   const urlGMap = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBFwGq-5iMAMkyT0ZocrJUant2pL0aPVrE&libraries=places&callback=initMap';
   // Cache needed resources
   event.waitUntil(
-    caches.open(appCacheName).then((cache) => {
+    caches.open(appCacheName).then(cache => {
       // Fetch net for Google Maps and cache it
       // (no need to clone the response if I don't return it)
-      fetch(urlGMap, {mode : "no-cors"}).then((response) => {
+      fetch(urlGMap, {mode : "no-cors"}).then(response => {
         return cache.put(urlGMap, response)
-      }).catch((err) => {
+      })
+      .then(() => {
+        console.log('Google Maps API cached with success!')
+      })
+      .catch((err) => {
         console.warn('Failed to cache Google Maps API!', err);
       });
       // Install as not a dependency, from Jake Archibald - Offline Cookbook
       // https://jakearchibald.com/2014/offline-cookbook/#on-install-not-as-a-dependency
-      cache.addAll(urlsFromNet).catch((err) => {
+      cache.addAll(urlsFromNet)
+      .then(() => {
+        console.log('Fonts cached with success!');
+      })
+      .catch(err => {
         console.warn('Failed to cache fonts!', err);
       });
       // Core dependencies
-      return cache.addAll(urlsFromApp).catch((err) => {
-        console.error("An error occurred during the installation of the service worker: ", err);
+      return cache.addAll(urlsFromApp)
+      .then(() => {
+        console.log('App resources cached with success');
+      })
+      .catch(err => {
+        console.error('Failed to cache app resources!', err);
       });
     })
   );
+  // Create IDB restaurants database
+  dbPromise = openDatabase();
+  // Fetch all restaurants from server and puts them into the IDB
+  fetch(`${serverREST}/restaurants`)
+  .then(response => response.json())
+  .then(restaurants => {
+    dbPromise.then(db => {
+      const tx = db.transaction('restaurants', 'readwrite');
+      const keyValStore = tx.objectStore('restaurants');
+      for (let r of restaurants) {
+        keyValStore.put(r);
+      }
+      return tx.complete;
+    }).then(() => {
+      console.log('All restaurants added to IndexDB!');
+    });
+  }).catch(err => {
+    console.warn('Failed to save all restaurants in IndexDB!', err);
+  });
 });
 
 // Clean cache after service worker updates
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
   event.waitUntil(
     // Search in all caches for cache of older versions
     caches.keys().then((allCacheNames) => {
@@ -76,18 +110,42 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-self.addEventListener('fetch', function(event) {
+self.addEventListener('fetch', event => {
   const requestURL = new URL(event.request.url);
-
   // Detect and trys to handle the restaurant details.
   if (requestURL.origin === location.origin && requestURL.pathname === '/restaurant.html') {
     event.respondWith(caches.match('/restaurant.html'));
     return;
   }
-
+  // Detect and trys to handle restaurants json requests with IDB.
+  if (requestURL.origin === serverREST) {
+    // All restaurants
+    if (requestURL.pathname === '/restaurants') {
+      //TODO
+      console.log('richiesti TUTTI');
+    }
+    // A specific restaurant
+    else if (requestURL.pathname.match(/restaurants\/\d+/)) {
+      //TODO
+      console.log('ristorante specifico');
+    }
+  }
   event.respondWith(
     caches.match(event.request).then(function(response) {
       return response || fetch(event.request);
     })
   );
 });
+
+const openDatabase = () => {
+  // Creates restaurants idb with unique key "id" and indexed by "neighborhood" and "cuisine_type"
+  return idb.open('restaurants-db', 1, upgradeDb => {
+    switch (upgradeDb.oldVersion) {
+      case 0:
+        const store = upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
+        store.createIndex('neighborhood', 'neighborhood');
+        store.createIndex('cuisine_type', 'cuisine_type');
+      // more cases as version increases
+    }
+  });
+};

@@ -1,7 +1,7 @@
 /**
  * Common database helper functions.
  */
-class DBHelper {
+export default class DBHelper {
 
   /**
    * Database URL.
@@ -30,7 +30,7 @@ class DBHelper {
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
-    fetch(`${DBHelper.DATABASE_URL}\\${id}`)
+    fetch(`${DBHelper.DATABASE_URL}/${id}`)
     .then(response => response.json())
     .then(restaurant => {
       callback(null, restaurant)
@@ -156,5 +156,4 @@ class DBHelper {
     );
     return marker;
   }
-
 }
