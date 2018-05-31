@@ -107,7 +107,7 @@ self.addEventListener('fetch', event => {
   // Detect and trys to handle restaurants json requests with IDB.
   if (requestURL.origin === serverREST) {
     // All restaurants
-    if (requestURL.pathname === '/restaurants') {
+    if (requestURL.pathname === '/restaurants' && dbPromise) {
       // Gets all restaurants from IDB and return them, then fetch the net for updates to save
       // on IDB for future requests
       console.log('Getting all restaurants from IDB');
@@ -135,7 +135,7 @@ self.addEventListener('fetch', event => {
       return;
     }
     // Gets a specific restaurant (if URL matches the exact regex)
-    else if (requestURL.pathname.match(/^\/restaurants\/\d+$/)) {
+    else if (requestURL.pathname.match(/^\/restaurants\/\d+$/) && dbPromise) {
       // Extract the restaurant id from the URL
       const id = requestURL.pathname.substring(requestURL.pathname.lastIndexOf('/') + 1, requestURL.pathname.length);
       console.log(`Getting restaurant with id: ${id} from IDB`);
