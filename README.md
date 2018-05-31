@@ -63,7 +63,7 @@ meaning that source files are copied instead of being minified and uglified (sin
 * `$ npm run build`, builds the *frontend/dist/* folder with all the files 
 needed by the app bundled together, minified and uglified when possible, but avoids starting and watching the server.
 
-* `$ npm run dev`, bgenerates the *frontend/dist/* folder with all the files 
+* `$ npm run dev`, generates the *frontend/dist/* folder with all the files 
 needed by the app in development mode (no minification).
 
 #### Server:
