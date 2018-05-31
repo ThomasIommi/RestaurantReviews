@@ -25,6 +25,7 @@
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
     "babelify": "^8.0.0",
+    "browser-sync": "^2.24.4",
     "browserify": "^16.2.2",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
@@ -38,7 +39,12 @@
     "vinyl-source-stream": "^2.0.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "gulp dev",
+    "build": "gulp prod",
+    "dev-watch": "gulp dev-watch",
+    "build-watch": "gulp prod-watch",
+    "start": "gulp prod-watch"
   },
   "repository": {
     "type": "git",

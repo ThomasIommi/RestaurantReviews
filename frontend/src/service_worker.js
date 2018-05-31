@@ -110,9 +110,9 @@ self.addEventListener('fetch', event => {
     if (requestURL.pathname === '/restaurants') {
       // Gets all restaurants from IDB and return them, then fetch the net for updates to save
       // on IDB for future requests
+      console.log('Getting all restaurants from IDB');
       event.respondWith(
         dbPromise.then(db => {
-          console.log('Getting all restaurants from IDB');
           const tx = db.transaction('restaurants');
           const store = tx.objectStore('restaurants');
           return store.getAll();
@@ -138,9 +138,9 @@ self.addEventListener('fetch', event => {
     else if (requestURL.pathname.match(/^\/restaurants\/\d+$/)) {
       // Extract the restaurant id from the URL
       const id = requestURL.pathname.substring(requestURL.pathname.lastIndexOf('/') + 1, requestURL.pathname.length);
+      console.log(`Getting restaurant with id: ${id} from IDB`);
       event.respondWith(
         dbPromise.then(db => {
-          console.log(`Getting restaurant with id: ${id} from IDB`);
           const tx = db.transaction('restaurants');
           const store = tx.objectStore('restaurants');
           return store.get(parseInt(id));
