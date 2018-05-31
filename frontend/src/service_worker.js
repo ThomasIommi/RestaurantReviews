@@ -1,7 +1,7 @@
 import idb from 'idb';
 
 const staticName = 'restaurant-reviews-cache-v';
-const version = 1;
+const version = 2;
 const appCacheName = staticName+version;
 const serverREST = 'http://localhost:1337';
 let dbPromise;
