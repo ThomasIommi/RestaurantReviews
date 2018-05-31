@@ -124,8 +124,8 @@ self.addEventListener('fetch', event => {
       //TODO
       console.log('richiesti TUTTI');
     }
-    // A specific restaurant
-    else if (requestURL.pathname.match(/restaurants\/\d+/)) {
+    // A specific restaurant (if URL matches the exact regex)
+    else if (requestURL.pathname.match(/^\/restaurants\/\d+$/)) {
       //TODO
       console.log('ristorante specifico');
     }

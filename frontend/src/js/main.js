@@ -94,8 +94,9 @@ window.initMap = () => {
 
 /**
  * Update page and map for current restaurants.
+ * Note: Called from outside the bundle
  */
-const updateRestaurants = () => {
+window.updateRestaurants = () => {
   const cSelect = document.getElementById('cuisines-select');
   const nSelect = document.getElementById('neighborhoods-select');
 
