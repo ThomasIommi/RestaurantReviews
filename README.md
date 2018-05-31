@@ -78,7 +78,7 @@ development and the *Gulp* script will build the app and run *browser-sync* auto
 or
 
 1. Run the commands `$ npm run build` for production, `$ npm run dev` for development.
-2. Mode into the new created folder *frontend/dist/*
+2. Move into the new created folder *frontend/dist/*
 3. Start up a simple HTTP server to serve up the site files on your local computer. 
 Python has some simple tools to do this. In a terminal, check the version of Python you have: `python -V`. 
 If you have Python 2.x, spin up the server with `python -m SimpleHTTPServer 8000` (or some other port, if port 8000 is 
