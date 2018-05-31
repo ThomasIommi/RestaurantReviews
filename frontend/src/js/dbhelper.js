@@ -144,6 +144,13 @@ export default class DBHelper {
   }
 
   /**
+   * Restaurant image preview URL.
+   */
+  static previewImageUrlForRestaurant(restaurant) {
+    return (`./img/previews/${restaurant.photograph}.jpg`);
+  }
+
+  /**
    * Map marker for a restaurant.
    */
   static mapMarkerForRestaurant(restaurant, map) {

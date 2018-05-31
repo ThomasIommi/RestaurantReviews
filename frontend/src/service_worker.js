@@ -19,17 +19,19 @@ self.addEventListener('install', event => {
     'css/style_huge.css',
     'js/bundles/main_bundle.js',
     'js/bundles/restaurant_bundle.js',
-    'img/1.jpg',
-    'img/2.jpg',
-    'img/3.jpg',
-    'img/4.jpg',
-    'img/5.jpg',
-    'img/6.jpg',
-    'img/7.jpg',
-    'img/8.jpg',
-    'img/9.jpg',
-    'img/10.jpg',
-    'img/favicon.ico' // from FreeFavicon.com
+    'img/1.jpg', 'img/previews/1.jpg',
+    'img/2.jpg', 'img/previews/2.jpg',
+    'img/3.jpg', 'img/previews/3.jpg',
+    'img/4.jpg', 'img/previews/4.jpg',
+    'img/5.jpg', 'img/previews/5.jpg',
+    'img/6.jpg', 'img/previews/6.jpg',
+    'img/7.jpg', 'img/previews/7.jpg',
+    'img/8.jpg', 'img/previews/8.jpg',
+    'img/9.jpg', 'img/previews/9.jpg',
+    'img/10.jpg', 'img/previews/10.jpg',
+    'img/icons/favicon.ico', // from FreeFavicon.com
+    'img/icons/app_icon_192.png', // from https://it.wikipedia.org/wiki/File:Emojione_1F355.svg
+    'img/icons/app_icon_512.png'
   ];
   // Arrays of request from web to cache (might fail)
   const urlsFromNet = [
@@ -76,22 +78,7 @@ self.addEventListener('install', event => {
   // Create IDB restaurants database
   dbPromise = openDatabase();
   // Fetch all restaurants from server and puts them into the IDB
-  fetch(`${serverREST}/restaurants`)
-  .then(response => response.json())
-  .then(restaurants => {
-    dbPromise.then(db => {
-      const tx = db.transaction('restaurants', 'readwrite');
-      const keyValStore = tx.objectStore('restaurants');
-      for (let r of restaurants) {
-        keyValStore.put(r);
-      }
-      return tx.complete;
-    }).then(() => {
-      console.log('All restaurants added to IndexDB!');
-    });
-  }).catch(err => {
-    console.warn('Failed to save all restaurants in IndexDB!', err);
-  });
+  refreshRestaurants(true);
 });
 
 // Clean cache after service worker updates
@@ -121,13 +108,59 @@ self.addEventListener('fetch', event => {
   if (requestURL.origin === serverREST) {
     // All restaurants
     if (requestURL.pathname === '/restaurants') {
-      //TODO
-      console.log('richiesti TUTTI');
+      // Gets all restaurants from IDB and return them, then fetch the net for updates to save
+      // on IDB for future requests
+      event.respondWith(
+        dbPromise.then(db => {
+          console.log('Getting all restaurants from IDB');
+          const tx = db.transaction('restaurants');
+          const store = tx.objectStore('restaurants');
+          return store.getAll();
+        })
+        .catch(err => {
+          console.error('Failed to retrive restaurants from IDB', err);
+        })
+        .then(restaurants => {
+          if (restaurants) {
+            return new Response(JSON.stringify(restaurants), {
+              headers: {
+                'content-type': 'application/json;charset=UTF-8'
+              }
+            });
+          }
+          else return fetch(event.request);
+        })
+      );
+      refreshRestaurants(false);
+      return;
     }
-    // A specific restaurant (if URL matches the exact regex)
+    // Gets a specific restaurant (if URL matches the exact regex)
     else if (requestURL.pathname.match(/^\/restaurants\/\d+$/)) {
-      //TODO
-      console.log('ristorante specifico');
+      // Extract the restaurant id from the URL
+      const id = requestURL.pathname.substring(requestURL.pathname.lastIndexOf('/') + 1, requestURL.pathname.length);
+      event.respondWith(
+        dbPromise.then(db => {
+          console.log(`Getting restaurant with id: ${id} from IDB`);
+          const tx = db.transaction('restaurants');
+          const store = tx.objectStore('restaurants');
+          return store.get(parseInt(id));
+        })
+        .catch(err => {
+          console.error(`Failed to retrive restaurant with id: ${id} from IDB`, err);
+        })
+        .then(restaurant => {
+          if (restaurant) {
+            return new Response(JSON.stringify(restaurant), {
+              headers: {
+                'content-type': 'application/json;charset=UTF-8'
+              }
+            });
+          }
+          else return fetch(event.request);
+        })
+      );
+      refreshRestaurant(id);
+      return;
     }
   }
   event.respondWith(
@@ -137,8 +170,10 @@ self.addEventListener('fetch', event => {
   );
 });
 
+/**
+ * Creates restaurants idb with unique key "id" and indexed by "neighborhood" and "cuisine_type"
+ */
 const openDatabase = () => {
-  // Creates restaurants idb with unique key "id" and indexed by "neighborhood" and "cuisine_type"
   return idb.open('restaurants-db', 1, upgradeDb => {
     switch (upgradeDb.oldVersion) {
       case 0:
@@ -147,5 +182,53 @@ const openDatabase = () => {
         store.createIndex('cuisine_type', 'cuisine_type');
       // more cases as version increases
     }
+  });
+};
+
+/**
+ * Fetches the rest server for updating IDB with restaurants
+ */
+const refreshRestaurants = (firstSave) => {
+  console.log(`Fetching network to ${firstSave ? 'save' : 'update'} restaurants data`);
+  fetch(`${serverREST}/restaurants`)
+  .then(response => response.json())
+  .then(restaurants => {
+    dbPromise.then(db => {
+      const tx = db.transaction('restaurants', 'readwrite');
+      const keyValStore = tx.objectStore('restaurants');
+      if (restaurants) {
+        for (let r of restaurants) {
+          keyValStore.put(r);
+        }
+      }
+      return tx.complete;
+    }).then(() => {
+      console.log(`All restaurants ${firstSave ? 'saved' : 'updated'} to IndexDB!`);
+    });
+  }).catch(err => {
+    console.warn(`Failed to ${firstSave ? 'save' : 'update'} all restaurants in IndexDB!`, err);
+  });
+};
+
+/**
+ * Fetches the rest server for updating IDB with a specific restaurant
+ */
+const refreshRestaurant = (id) => {
+  console.log(`Fetching network to update restaurant with id: ${id}`);
+  fetch(`${serverREST}/restaurants/${id}`)
+  .then(response => response.json())
+  .then(restaurant => {
+    dbPromise.then(db => {
+      const tx = db.transaction('restaurants', 'readwrite');
+      const keyValStore = tx.objectStore('restaurants');
+      if (restaurant) {
+        keyValStore.put(restaurant);
+      }
+      return tx.complete;
+    }).then(() => {
+      console.log(`Restaurants with id: ${id} updated to IndexDB!`);
+    });
+  }).catch(err => {
+    console.warn(`Failed to update restaurant with id: ${id} to IndexDB!`, err);
   });
 };

@@ -1,4 +1,5 @@
 import DBHelper from './dbhelper';
+import lazyLoadImages from './lazy_load_images';
 
 let restaurants,
   neighborhoods,
@@ -165,6 +166,7 @@ const fillRestaurantsHTML = (restaurants = self.restaurants) => {
     resultsCounter.id = 'results-counter';
     resultsCounter.setAttribute('aria-live', 'polite');
     container.append(resultsCounter);
+    lazyLoadImages();
     addMarkersToMap();
   }
 };
@@ -176,8 +178,9 @@ const createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
 
   const image = document.createElement('img');
-  image.className = 'restaurant-img';
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.className = 'restaurant-img lazy-load';
+  image.setAttribute('data-src', DBHelper.imageUrlForRestaurant(restaurant));
+  image.src = DBHelper.previewImageUrlForRestaurant(restaurant);
   image.alt = restaurant.alt;
   image.title = restaurant.name;
   li.append(image);

@@ -10,6 +10,7 @@ const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const runSequence = require('run-sequence');
 const del = require('del');
+const jimp = require('gulp-jimp');
 
 // 'dev-watch' as default task
 gulp.task('default', ['dev-watch']);
@@ -21,6 +22,8 @@ gulp.task('dev-watch', ['dev'], () => {
   gulp.watch('src/*.html', ['copy-html'])
   .on('change', browserSync.reload);
   gulp.watch('src/**/*.js', ['bundle-js-dev'])
+  .on('change', browserSync.reload);
+  gulp.watch('src/manifest.json', ['copy-manifest'])
   .on('change', browserSync.reload);
   browserSync.init({
     server: 'dist/',
@@ -36,6 +39,8 @@ gulp.task('prod-watch', ['prod'], () => {
   gulp.watch('src/*.html', ['copy-html'])
   .on('change', browserSync.reload);
   gulp.watch('src/**/*.js', ['bundle-js-prod'])
+  .on('change', browserSync.reload);
+  gulp.watch('src/manifest.json', ['copy-manifest'])
   .on('change', browserSync.reload);
   browserSync.init({
     server: 'dist/',
@@ -62,10 +67,40 @@ gulp.task('copy-html', () => {
     .pipe(gulp.dest('dist/'));
 });
 
-// simply copies img files into dist folder
+// simply copies manifest.json file into dist folder
+gulp.task('copy-manifest', () => {
+  gulp.src('src/manifest.json')
+  .pipe(gulp.dest('dist/'));
+});
+
+// copies img files into dist folder, creates previews and manifest images
 gulp.task('copy-imgs', () => {
-  gulp.src('resources/img/**')
+  // move images
+  gulp.src(['resources/img/**', '!resources/img/icons/app_icon.png'])
   .pipe(gulp.dest('dist/img/'));
+  // create previews
+  gulp.src('resources/img/*.jpg')
+  .pipe(jimp({
+    '' : {
+      scale: 0.1,
+      blur: 60,
+      type: 'jpg'
+    }
+  }))
+  .pipe(gulp.dest('dist/img/previews/'));
+  // create manifest images
+  gulp.src('resources/img/icons/app_icon.png')
+  .pipe(jimp({
+    '_192' : {
+      resize: { width: 192, height: 192 },
+      type: 'png'
+    },
+    '_512' : {
+      resize: { width: 512, height: 512 },
+      type: 'png'
+    }
+  }))
+  .pipe(gulp.dest('dist/img/icons/'));
 });
 
 // bundles js files for dev mode and copies them and the service_worker.js file into dist folder
@@ -167,7 +202,7 @@ gulp.task('clean-dist', () => {
 gulp.task('dev', (callback) => {
   runSequence(
     'clean-dist',
-    ['compile-scss', 'copy-html', 'copy-imgs', 'bundle-js-dev'],
+    ['compile-scss', 'copy-html', 'copy-manifest', 'copy-imgs', 'bundle-js-dev'],
     callback);
 });
 
@@ -175,6 +210,6 @@ gulp.task('dev', (callback) => {
 gulp.task('prod', (callback) => {
   runSequence(
     'clean-dist',
-    ['compile-scss', 'copy-html', 'copy-imgs', 'bundle-js-prod'],
+    ['compile-scss', 'copy-html', 'copy-manifest', 'copy-imgs', 'bundle-js-prod'],
     callback);
 });
