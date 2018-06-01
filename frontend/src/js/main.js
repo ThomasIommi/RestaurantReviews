@@ -181,7 +181,9 @@ const createRestaurantHTML = (restaurant) => {
   image.className = 'restaurant-img lazy-load';
   image.setAttribute('data-src', DBHelper.imageUrlForRestaurant(restaurant));
   image.src = DBHelper.previewImageUrlForRestaurant(restaurant);
-  image.alt = restaurant.alt;
+  // NOTE: edited the db on the server on localDiskDb.db inserting reasonable alt attributes to the JSON,
+  // if these alt tags aren't present fallback on restaurant name
+  image.alt = restaurant.alt ? restaurant.alt : restaurant.name;
   image.title = restaurant.name;
   li.append(image);
 

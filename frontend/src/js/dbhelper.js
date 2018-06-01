@@ -140,14 +140,14 @@ export default class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return (`./img/${restaurant.photograph}.jpg`);
+    return (`./img/${restaurant.photograph ? restaurant.photograph : 'no_photo'}.jpg`);
   }
 
   /**
    * Restaurant image preview URL.
    */
   static previewImageUrlForRestaurant(restaurant) {
-    return (`./img/previews/${restaurant.photograph}.jpg`);
+    return (`./img/previews/${restaurant.photograph ? restaurant.photograph : 'no_photo'}.jpg`);
   }
 
   /**

@@ -30,6 +30,9 @@ Finally, optimize the app to meet performance benchmarks made with Lighthouse:
 * Accessibility > 90
 * Progessive Web App > 90
 
+**NOTE FOR REVIEWERS**: As suggested in */frontend/resources/audits/* there are 2 screenshots of Lighthouse audits, one with
+3G connection and CPU slowdown, the other in no throttling mode. BTW Thank you for the tips and tricks!
+
 ### Installation
 
 This app requires [Node.js](https://nodejs.org/) and [NPM](https://www.npmjs.com/) to be installed.

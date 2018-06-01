@@ -4,7 +4,17 @@ const staticName = 'restaurant-reviews-cache-v';
 const version = 2;
 const appCacheName = staticName+version;
 const serverREST = 'http://localhost:1337';
-let dbPromise;
+
+// Create IDB restaurants database
+const dbPromise = idb.open('restaurants-db', 1, upgradeDb => {
+  switch (upgradeDb.oldVersion) {
+    case 0:
+      const store = upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
+      store.createIndex('neighborhood', 'neighborhood');
+      store.createIndex('cuisine_type', 'cuisine_type');
+    // more cases as version increases
+  }
+});
 
 // Install service worker
 self.addEventListener('install', event => {
@@ -29,6 +39,7 @@ self.addEventListener('install', event => {
     'img/8.jpg', 'img/previews/8.jpg',
     'img/9.jpg', 'img/previews/9.jpg',
     'img/10.jpg', 'img/previews/10.jpg',
+    'img/no_photo.jpg', 'img/previews/no_photo.jpg', // from https://commons.wikimedia.org/wiki/File:Emojione_1F374.svg edited with Krita
     'img/icons/favicon.ico', // from FreeFavicon.com
     'img/icons/app_icon_192.png', // from https://it.wikipedia.org/wiki/File:Emojione_1F355.svg
     'img/icons/app_icon_512.png'
@@ -75,8 +86,6 @@ self.addEventListener('install', event => {
       });
     })
   );
-  // Create IDB restaurants database
-  dbPromise = openDatabase();
   // Fetch all restaurants from server and puts them into the IDB
   refreshRestaurants(true);
 });
@@ -169,21 +178,6 @@ self.addEventListener('fetch', event => {
     })
   );
 });
-
-/**
- * Creates restaurants idb with unique key "id" and indexed by "neighborhood" and "cuisine_type"
- */
-const openDatabase = () => {
-  return idb.open('restaurants-db', 1, upgradeDb => {
-    switch (upgradeDb.oldVersion) {
-      case 0:
-        const store = upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
-        store.createIndex('neighborhood', 'neighborhood');
-        store.createIndex('cuisine_type', 'cuisine_type');
-      // more cases as version increases
-    }
-  });
-};
 
 /**
  * Fetches the rest server for updating IDB with restaurants

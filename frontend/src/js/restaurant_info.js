@@ -68,7 +68,9 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   image.className = 'restaurant-img';
   image.title = restaurant.name;
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  image.alt = restaurant.alt;
+  // NOTE: edited the db on the server on localDiskDb.db inserting reasonable alt properties,
+  // if these alt tags aren't present fallback on restaurant name
+  image.alt = restaurant.alt ? restaurant.alt : restaurant.name;
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
