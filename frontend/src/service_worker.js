@@ -1,7 +1,7 @@
 import idb from 'idb';
 
 const staticName = 'restaurant-reviews-cache-v';
-const version = 2;
+const version = 3;
 const appCacheName = staticName+version;
 const serverREST = 'http://localhost:1337';
 
@@ -27,6 +27,7 @@ self.addEventListener('install', event => {
     'css/style_large.css',
     'css/style_extralarge.css',
     'css/style_huge.css',
+    'css/leaflet.css',
     'js/bundles/main_bundle.js',
     'js/bundles/restaurant_bundle.js',
     'img/1.jpg', 'img/previews/1.jpg',
@@ -42,7 +43,12 @@ self.addEventListener('install', event => {
     'img/no_photo.jpg', 'img/previews/no_photo.jpg', // from https://commons.wikimedia.org/wiki/File:Emojione_1F374.svg edited with Krita
     'img/icons/favicon.ico', // from FreeFavicon.com
     'img/icons/app_icon_192.png', // from https://it.wikipedia.org/wiki/File:Emojione_1F355.svg
-    'img/icons/app_icon_512.png'
+    'img/icons/app_icon_512.png',
+    'img/leaflet/layers.png',
+    'img/leaflet/layers-2x.png',
+    'img/leaflet/marker-icon.png',
+    'img/leaflet/marker-icon-2x.png',
+    'img/leaflet/marker-shadow.png',
   ];
   // Arrays of request from web to cache (might fail)
   const urlsFromNet = [
@@ -51,22 +57,26 @@ self.addEventListener('install', event => {
     'https://fonts.gstatic.com/s/greatvibes/v5/RWmMoKWR9v4ksMfaWd_JN9XLiaQoDmlrMlY.woff2',
     'https://fonts.gstatic.com/s/greatvibes/v5/RWmMoKWR9v4ksMfaWd_JN9XFiaQoDmlr.woff2',
   ];
+
+  // Replaced GMaps with Mapbox + Leaflet
   // Google Map request (CORS problem)
-  const urlGMap = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBFwGq-5iMAMkyT0ZocrJUant2pL0aPVrE&libraries=places&callback=initMap';
+  // const urlGMap = 'https://maps.googleapis.com/maps/api/js?libraries=places&callback=initMap';
   // Cache needed resources
   event.waitUntil(
     caches.open(appCacheName).then(cache => {
+      // Replaced GMaps with Mapbox + Leaflet
       // Fetch net for Google Maps and cache it
       // (no need to clone the response if I don't return it)
-      fetch(urlGMap, {mode : "no-cors"}).then(response => {
-        return cache.put(urlGMap, response)
-      })
-      .then(() => {
-        console.log('Google Maps API cached with success!')
-      })
-      .catch((err) => {
-        console.warn('Failed to cache Google Maps API!', err);
-      });
+      // fetch(urlGMap, {mode : "no-cors"}).then(response => {
+      //   return cache.put(urlGMap, response)
+      // })
+      // .then(() => {
+      //   console.log('Google Maps API cached with success!')
+      // })
+      // .catch((err) => {
+      //   console.warn('Failed to cache Google Maps API!', err);
+      // });
+
       // Install as not a dependency, from Jake Archibald - Offline Cookbook
       // https://jakearchibald.com/2014/offline-cookbook/#on-install-not-as-a-dependency
       cache.addAll(urlsFromNet)
@@ -76,6 +86,7 @@ self.addEventListener('install', event => {
       .catch(err => {
         console.warn('Failed to cache fonts!', err);
       });
+
       // Core dependencies
       return cache.addAll(urlsFromApp)
       .then(() => {
@@ -86,6 +97,7 @@ self.addEventListener('install', event => {
       });
     })
   );
+
   // Fetch all restaurants from server and puts them into the IDB
   refreshRestaurants(true);
 });

@@ -11,6 +11,7 @@ const buffer = require('vinyl-buffer');
 const runSequence = require('run-sequence');
 const del = require('del');
 const jimp = require('gulp-jimp');
+const rename = require('gulp-rename');
 
 // 'dev-watch' as default task
 gulp.task('default', ['dev-watch']);
@@ -51,10 +52,19 @@ gulp.task('prod-watch', ['prod'], () => {
 
 // compiles sass style files and inserts vendor prefixes automatically
 // with autoprefixer
+// takes leaflet.css from node_modules also, converts it in scss and compress it in dist/css/
 gulp.task('compile-scss', () => {
   gulp.src('src/sass/**/*.scss')
     .pipe(sass({outputStyle: 'compressed'})
       .on('error', sass.logError))
+    .pipe(autoprefixer({
+      browsers: ['last 2 versions']
+    }))
+    .pipe(gulp.dest('dist/css/'));
+  gulp.src('node_modules/leaflet/dist/leaflet.css')
+    .pipe(rename("leaflet.scss"))
+    .pipe(sass({outputStyle: 'compressed'})
+    .on('error', sass.logError))
     .pipe(autoprefixer({
       browsers: ['last 2 versions']
     }))
@@ -73,7 +83,7 @@ gulp.task('copy-manifest', () => {
   .pipe(gulp.dest('dist/'));
 });
 
-// copies img files into dist folder, creates previews and manifest images
+// copies img files into dist folder, creates previews, manifest images and copies leaflet icons
 gulp.task('copy-imgs', () => {
   // move images
   gulp.src(['resources/img/**', '!resources/img/icons/app_icon.png'])
@@ -101,6 +111,10 @@ gulp.task('copy-imgs', () => {
     }
   }))
   .pipe(gulp.dest('dist/img/icons/'));
+  // copy leaflet icons
+  gulp.src('node_modules/leaflet/dist/images/**.png')
+  .pipe(gulp.dest('dist/img/leaflet/'))
+
 });
 
 // bundles js files for dev mode and copies them and the service_worker.js file into dist folder

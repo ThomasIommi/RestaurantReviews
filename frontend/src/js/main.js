@@ -1,10 +1,21 @@
 import DBHelper from './dbhelper';
 import lazyLoadImages from './lazy_load_images';
+import L from 'leaflet';
+
+// LEAFLET SETTINGS:
+
+// tells Leaflet were to find its images
+L.Icon.Default.imagePath = 'img/leaflet/';
+
+// workaround to avoid Chrome scrolling to the focused item
+L.Control.include({
+  _refocusOnMap: L.Util.falseFn // Do nothing.
+});
 
 let restaurants,
   neighborhoods,
   cuisines;
-let map;
+let newMap;
 let markers = [];
 
 /**
@@ -17,7 +28,8 @@ if (navigator.serviceWorker) {
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('DOMContentLoaded', () => {
+  initMap();
   fetchNeighborhoods();
   fetchCuisines();
 });
@@ -28,7 +40,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 const fetchNeighborhoods = () => {
   DBHelper.fetchNeighborhoods((error, neighborhoods) => {
     if (error) { // Got an error
-      console.error(error);
+      console.error("DBHelper.fetchNeighborhoods() got an error:", error);
     } else {
       self.neighborhoods = neighborhoods;
       fillNeighborhoodsHTML();
@@ -55,7 +67,7 @@ const fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
 const fetchCuisines = () => {
   DBHelper.fetchCuisines((error, cuisines) => {
     if (error) { // Got an error!
-      console.error(error);
+      console.error("DBHelper.fetchCuisines() got an error:", error);
     } else {
       self.cuisines = cuisines;
       fillCuisinesHTML();
@@ -78,18 +90,36 @@ const fillCuisinesHTML = (cuisines = self.cuisines) => {
 };
 
 /**
- * Initialize Google map, called from HTML.
+ * Initialize Mapbox + Leaflet map, called from HTML.
  */
-window.initMap = () => {
-  let loc = {
-    lat: 40.722216,
-    lng: -73.987501
-  };
-  self.map = new google.maps.Map(document.getElementById('map'), {
+// Replaced GMaps with Mapbox + Leaflet
+// window.initMap = () => {
+//   let loc = {
+//     lat: 40.722216,
+//     lng: -73.987501
+//   };
+//   self.map = new google.maps.Map(document.getElementById('map'), {
+//     zoom: 12,
+//     center: loc,
+//     scrollwheel: false
+//   });
+//   updateRestaurants();
+// };
+const initMap = () => {
+  self.newMap = L.map('map', {
+    center: [40.722216, -73.987501],
     zoom: 12,
-    center: loc,
-    scrollwheel: false
+    scrollWheelZoom: false
   });
+  L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
+    mapboxToken: 'pk.eyJ1IjoidGhvbWFzaW9tbWkiLCJhIjoiY2ppZGU1bXY1MDFkZjN5b2NyOW9sZGJlZyJ9.q1R_4JfiQ0nEgjoDZDyI8Q',
+    maxZoom: 18,
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    id: 'mapbox.streets'
+  }).addTo(self.newMap);
+
   updateRestaurants();
 };
 
@@ -109,7 +139,7 @@ window.updateRestaurants = () => {
 
   DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
     if (error) { // Got an error!
-      console.error(error);
+      console.error("DBHelper.fetchRestaurantByCuisineAndNeighborhood() got an error:", error);
     } else {
       resetRestaurants(restaurants);
       fillRestaurantsHTML();
@@ -214,14 +244,25 @@ const createRestaurantHTML = (restaurant) => {
 /**
  * Add markers for current restaurants to the map.
  */
+// Replaced GMaps with Mapbox + Leaflet
+// const addMarkersToMap = (restaurants = self.restaurants) => {
+//   restaurants.forEach(restaurant => {
+//     // Add marker to the map
+//     const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
+//     google.maps.event.addListener(marker, 'click', () => {
+//       window.location.href = marker.url
+//     });
+//     self.markers.push(marker);
+//   });
+// };
 const addMarkersToMap = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
     // Add marker to the map
-    const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
-    google.maps.event.addListener(marker, 'click', () => {
-      window.location.href = marker.url
-    });
-    self.markers.push(marker);
+    const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.newMap);
+    marker.on("click", onClick);
+    function onClick() {
+      window.location.href = marker.options.url;
+    }
   });
 };
 

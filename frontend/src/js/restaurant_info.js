@@ -1,7 +1,18 @@
 import DBHelper from './dbhelper';
+import L from 'leaflet';
+
+// LEAFLET SETTINGS:
+
+// tells Leaflet were to find its images
+L.Icon.Default.imagePath = 'img/leaflet/';
+
+// workaround to avoid Chrome scrolling to the focused item
+L.Control.include({
+  _refocusOnMap: L.Util.falseFn // Do nothing.
+});
 
 let restaurant;
-let map;
+let newMap;
 
 /**
  * Register service worker
@@ -11,20 +22,61 @@ if (navigator.serviceWorker) {
 }
 
 /**
- * Initialize Google map, called from HTML.
+ * Initialize Mapbox + Leaflet map.
  */
-window.initMap = () => {
+// Replaced GMaps with Mapbox + Leaflet
+// window.initMap = () => {
+//   fetchRestaurantFromURL((error, restaurant) => {
+//     if (error) { // Got an error!
+//       console.error(error);
+//     } else {
+//       self.map = new google.maps.Map(document.getElementById('map'), {
+//         zoom: 16,
+//         center: restaurant.latlng,
+//         scrollwheel: false
+//       });
+//       fillBreadcrumb();
+//       DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+//     }
+//   });
+// };
+document.addEventListener('DOMContentLoaded', () => {
+  initMap();
+});
+
+const initMap = () => {
   fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!
-      console.error(error);
+      console.error('fetchRestaurantFromURL() got an error:', error);
     } else {
-      self.map = new google.maps.Map(document.getElementById('map'), {
+      const map = document.getElementById('map');
+      const mapHeight = map.clientHeight;
+      self.newMap = L.map(map, {
+        center: [restaurant.latlng.lat, restaurant.latlng.lng],
         zoom: 16,
-        center: restaurant.latlng,
-        scrollwheel: false
+        scrollWheelZoom: false
       });
+      const tileLayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
+        mapboxToken: 'pk.eyJ1IjoidGhvbWFzaW9tbWkiLCJhIjoiY2ppZGU1bXY1MDFkZjN5b2NyOW9sZGJlZyJ9.q1R_4JfiQ0nEgjoDZDyI8Q',
+        maxZoom: 18,
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        id: 'mapbox.streets'
+      });
+      tileLayer.addTo(self.newMap);
+
+      // reloads the map tileLayer just after it has finished loading if the map element has changed its height,
+      // it's a workaround needed due to the fact that (probably) when initMap() is called, css/flexbox has not already calculated
+      // the exact height of the map container
+      tileLayer.on('load', () => {
+        const mapHeightAfterLoad = map.clientHeight;
+        if (mapHeight !== mapHeightAfterLoad)
+          self.newMap.invalidateSize();
+      });
+
       fillBreadcrumb();
-      DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+      DBHelper.mapMarkerForRestaurant(self.restaurant, self.newMap);
     }
   });
 };
@@ -39,13 +91,12 @@ const fetchRestaurantFromURL = (callback) => {
   }
   const id = getParameterByName('id');
   if (!id) { // no id found in URL
-    error = 'No restaurant id in URL';
-    callback(error, null);
+    callback('No restaurant id in URL', null);
   } else {
     DBHelper.fetchRestaurantById(id, (error, restaurant) => {
       self.restaurant = restaurant;
       if (!restaurant) {
-        console.error(error);
+        console.error("DBHelper.fetchRestaurantById() got an error:", error);
         return;
       }
       fillRestaurantHTML();
@@ -159,7 +210,7 @@ const createReviewHTML = (review) => {
 /**
  * Add restaurant name to the breadcrumb navigation menu.
  */
-const fillBreadcrumb = (restaurant=self.restaurant) => {
+const fillBreadcrumb = (restaurant = self.restaurant) => {
   const breadcrumb = document.getElementById('breadcrumb');
   const li = document.createElement('li');
   const a = document.createElement('a');

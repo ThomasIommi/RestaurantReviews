@@ -2,17 +2,18 @@
 <html lang="en">
 
 <head>
-  <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
+  <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" media="screen and (min-width: 540px)" href="css/style_medium.css">
   <link rel="stylesheet" media="screen and (min-width: 720px)" href="css/style_large.css">
   <link rel="stylesheet" media="screen and (min-width: 880px)" href="css/style_extralarge.css">
   <link rel="stylesheet" media="screen and (min-width: 1300px)" href="css/style_huge.css">
+  <link rel="stylesheet" href="css/leaflet.css">
   <link rel="icon" href="img/icons/favicon.ico">
   <link rel="manifest" href="manifest.json">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="utf-8">
-  <meta name="theme-color" content="#ffa500"/>
+  <meta name="theme-color" content="#ffa500">
   <title>Restaurant Reviews</title>
 </head>
 
@@ -25,7 +26,7 @@
 
   <main id="maincontent">
     <section id="map-container">
-      <div id="map" aria-label="Google Maps container" role="application"></div>
+      <div id="map" aria-label="OpenStreetMap container" role="application"></div>
     </section>
     <section id="restaurant-list-container" tabindex="-1">
       <div class="filter-options">
@@ -50,7 +51,8 @@
   </footer>
 
   <script type="application/javascript" charset="utf-8" src="js/bundles/main_bundle.js"></script>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFwGq-5iMAMkyT0ZocrJUant2pL0aPVrE&libraries=places&callback=initMap"></script>
+  <!--<script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=initMap"></script>-->
+
 
 </body>
 </html>

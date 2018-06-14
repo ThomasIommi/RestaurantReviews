@@ -112,7 +112,7 @@ To grant accessibility to user with some sort of imparement were made some adjus
 (following the [WCAG checklist](https://www.w3.org/TR/2006/WD-WCAG20-20060427/appendixB.html)):
  - added [ARIA](https://www.w3.org/TR/html-aria/) roles and labels to the HTML pages
  - added alt tags to every image
- - managed the tab control and created a button to skip navigation buttons and Google map
+ - managed the tab control and created a button to skip navigation buttons and Mapbox map
   
 ### Service Worker
 To guarantee the functioning of the application even offline, a service worker was introduced.
@@ -128,9 +128,4 @@ Super useful cookbook on the subject by Jake Archibald's blog ([here](https://ja
 Request from Cross Origin can't be cached in addAll() method even with mode: "no-cors" header. (Or I just failed at it! :D)
 It was needed to fetch the request (with the no-cors header) on the net and only then clone the response and cache that 
 instead.
-
-###### Google Maps caching
-For now only the main Google Maps API is cached (with the no-cors method), everything else isn't. So the map won't work 
-offline!
-That was necessary for the callback (initMap) that instantiates everything necessary for the app to work.
 
