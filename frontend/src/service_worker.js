@@ -48,14 +48,14 @@ self.addEventListener('install', event => {
     'img/leaflet/layers-2x.png',
     'img/leaflet/marker-icon.png',
     'img/leaflet/marker-icon-2x.png',
-    'img/leaflet/marker-shadow.png',
+    'img/leaflet/marker-shadow.png'
   ];
   // Arrays of request from web to cache (might fail)
   const urlsFromNet = [
     'https://fonts.gstatic.com/s/berkshireswash/v6/ptRRTi-cavZOGqCvnNJDl5m5XmN_pM4zT305QaYc.woff2', // Fonts from Google Fonts
     'https://fonts.gstatic.com/s/berkshireswash/v6/ptRRTi-cavZOGqCvnNJDl5m5XmN_qs4zT305QQ.woff2',
     'https://fonts.gstatic.com/s/greatvibes/v5/RWmMoKWR9v4ksMfaWd_JN9XLiaQoDmlrMlY.woff2',
-    'https://fonts.gstatic.com/s/greatvibes/v5/RWmMoKWR9v4ksMfaWd_JN9XFiaQoDmlr.woff2',
+    'https://fonts.gstatic.com/s/greatvibes/v5/RWmMoKWR9v4ksMfaWd_JN9XFiaQoDmlr.woff2'
   ];
 
   // Replaced GMaps with Mapbox + Leaflet
