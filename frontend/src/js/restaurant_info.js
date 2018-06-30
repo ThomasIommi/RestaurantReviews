@@ -12,6 +12,7 @@ L.Control.include({
 });
 
 let restaurant;
+let reviews;
 let newMap;
 
 /**
@@ -24,22 +25,6 @@ if (navigator.serviceWorker) {
 /**
  * Initialize Mapbox + Leaflet map.
  */
-// Replaced GMaps with Mapbox + Leaflet
-// window.initMap = () => {
-//   fetchRestaurantFromURL((error, restaurant) => {
-//     if (error) { // Got an error!
-//       console.error(error);
-//     } else {
-//       self.map = new google.maps.Map(document.getElementById('map'), {
-//         zoom: 16,
-//         center: restaurant.latlng,
-//         scrollwheel: false
-//       });
-//       fillBreadcrumb();
-//       DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
-//     }
-//   });
-// };
 document.addEventListener('DOMContentLoaded', () => {
   initMap();
 });
@@ -102,6 +87,14 @@ const fetchRestaurantFromURL = (callback) => {
       fillRestaurantHTML();
       callback(null, restaurant)
     });
+    DBHelper.fetchReviewsById(id, (error, reviews) => {
+      self.reviews = reviews;
+      if (!reviews) {
+        console.error("DBHelper.fetchReviewsById() got an error:", error);
+        return;
+      }
+      fillReviewsHTML();
+    });
   }
 };
 
@@ -140,8 +133,6 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   if (restaurant.operating_hours) {
     fillRestaurantHoursHTML();
   }
-  // fill reviews
-  fillReviewsHTML();
 };
 
 /**
@@ -167,7 +158,7 @@ const fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hour
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+const fillReviewsHTML = (reviews = self.reviews) => {
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h2');
   title.innerHTML = 'Reviews';
@@ -198,7 +189,7 @@ const createReviewHTML = (review) => {
   header.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  date.innerHTML = new Date(review.createdAt).toLocaleDateString();
   header.appendChild(date);
 
   li.appendChild(header);

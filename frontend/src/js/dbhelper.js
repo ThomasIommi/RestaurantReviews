@@ -1,24 +1,29 @@
 import L from 'leaflet';
 
+const port = 1337; // Change this to your server port
+
 /**
  * Common database helper functions.
  */
 export default class DBHelper {
-
+  
   /**
    * Database URL.
    * Change this to restaurants.json file location on your server.
    */
-  static get DATABASE_URL() {
-    const port = 1337; // Change this to your server port
+  static get DB_RESTAURANTS_URL() {
     return `http://localhost:${port}/restaurants`;
+  }
+
+  static get DB_REVIEWS_URL() {
+    return `http://localhost:${port}/reviews`;
   }
 
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    fetch(DBHelper.DATABASE_URL)
+    fetch(DBHelper.DB_RESTAURANTS_URL)
     .then(response => response.json())
     .then(restaurants => {
       callback(null, restaurants)
@@ -32,10 +37,24 @@ export default class DBHelper {
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
-    fetch(`${DBHelper.DATABASE_URL}/${id}`)
+    fetch(`${DBHelper.DB_RESTAURANTS_URL}/${id}`)
     .then(response => response.json())
     .then(restaurant => {
       callback(null, restaurant)
+    })
+    .catch(err => {
+      callback(err, null)
+    });
+  }
+
+  /**
+   * Fetch all reviews by restaurant ID.
+   */
+  static fetchReviewsById(id, callback) {
+    fetch(`${DBHelper.DB_REVIEWS_URL}/?restaurant_id=${id}`)
+    .then(response => response.json())
+    .then(reviews => {
+      callback(null, reviews)
     })
     .catch(err => {
       callback(err, null)
@@ -155,17 +174,6 @@ export default class DBHelper {
   /**
    * Map marker for a restaurant.
    */
-  // Replaced GMaps with Mapbox + Leaflet
-  // static mapMarkerForRestaurant(restaurant, map) {
-  //   const marker = new google.maps.Marker({
-  //     position: restaurant.latlng,
-  //     title: restaurant.name,
-  //     url: DBHelper.urlForRestaurant(restaurant),
-  //     map: map,
-  //     animation: google.maps.Animation.DROP}
-  //   );
-  //   return marker;
-  // }
   static mapMarkerForRestaurant(restaurant, map) {
     const marker = new L.marker(
       [restaurant.latlng.lat, restaurant.latlng.lng],
@@ -183,12 +191,9 @@ export default class DBHelper {
    */
   static toggleFavoriteRestaurant(restaurant) {
     const setFavoriteTo = !restaurant.is_favorite;
-    return fetch(`${DBHelper.DATABASE_URL}/${restaurant.id}/`, {
+    return fetch(`${DBHelper.DB_RESTAURANTS_URL}/${restaurant.id}/`, {
       method: 'PUT',
       body: JSON.stringify({is_favorite: setFavoriteTo})
     })
   }
-
-
-
 }

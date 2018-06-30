@@ -92,19 +92,6 @@ const fillCuisinesHTML = (cuisines = self.cuisines) => {
 /**
  * Initialize Mapbox + Leaflet map, called from HTML.
  */
-// Replaced GMaps with Mapbox + Leaflet
-// window.initMap = () => {
-//   let loc = {
-//     lat: 40.722216,
-//     lng: -73.987501
-//   };
-//   self.map = new google.maps.Map(document.getElementById('map'), {
-//     zoom: 12,
-//     center: loc,
-//     scrollwheel: false
-//   });
-//   updateRestaurants();
-// };
 const initMap = () => {
   self.newMap = L.map('map', {
     center: [40.722216, -73.987501],
@@ -254,17 +241,6 @@ const createRestaurantHTML = (restaurant) => {
 /**
  * Add markers for current restaurants to the map.
  */
-// Replaced GMaps with Mapbox + Leaflet
-// const addMarkersToMap = (restaurants = self.restaurants) => {
-//   restaurants.forEach(restaurant => {
-//     // Add marker to the map
-//     const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
-//     google.maps.event.addListener(marker, 'click', () => {
-//       window.location.href = marker.url
-//     });
-//     self.markers.push(marker);
-//   });
-// };
 const addMarkersToMap = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
     // Add marker to the map

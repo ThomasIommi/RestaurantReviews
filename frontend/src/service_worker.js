@@ -9,10 +9,13 @@ const serverREST = 'http://localhost:1337';
 const dbPromise = idb.open('restaurants-db', 1, upgradeDb => {
   switch (upgradeDb.oldVersion) {
     case 0:
-      const store = upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
-      store.createIndex('neighborhood', 'neighborhood');
-      store.createIndex('cuisine_type', 'cuisine_type');
+      const restaurantStore = upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
+      restaurantStore.createIndex('neighborhood', 'neighborhood');
+      restaurantStore.createIndex('cuisine_type', 'cuisine_type');
     // more cases as version increases
+    case 1:
+      const reviewStore = upgradeDb.createObjectStore('reviews', {keyPath: 'id'});
+      reviewStore.createIndex('restaurant_id', 'restaurant_id');
   }
 });
 
@@ -44,11 +47,12 @@ self.addEventListener('install', event => {
     'img/icons/favicon.ico', // from FreeFavicon.com
     'img/icons/app_icon_192.png', // from https://it.wikipedia.org/wiki/File:Emojione_1F355.svg
     'img/icons/app_icon_512.png',
+    'img/icons/favorite.png', // from https://pixabay.com/it/uovo-uovo-cotto-pasto-2859327
     'img/leaflet/layers.png',
     'img/leaflet/layers-2x.png',
     'img/leaflet/marker-icon.png',
     'img/leaflet/marker-icon-2x.png',
-    'img/leaflet/marker-shadow.png'
+    'img/leaflet/marker-shadow.png',
   ];
   // Arrays of request from web to cache (might fail)
   const urlsFromNet = [
@@ -64,19 +68,6 @@ self.addEventListener('install', event => {
   // Cache needed resources
   event.waitUntil(
     caches.open(appCacheName).then(cache => {
-      // Replaced GMaps with Mapbox + Leaflet
-      // Fetch net for Google Maps and cache it
-      // (no need to clone the response if I don't return it)
-      // fetch(urlGMap, {mode : "no-cors"}).then(response => {
-      //   return cache.put(urlGMap, response)
-      // })
-      // .then(() => {
-      //   console.log('Google Maps API cached with success!')
-      // })
-      // .catch((err) => {
-      //   console.warn('Failed to cache Google Maps API!', err);
-      // });
-
       // Install as not a dependency, from Jake Archibald - Offline Cookbook
       // https://jakearchibald.com/2014/offline-cookbook/#on-install-not-as-a-dependency
       cache.addAll(urlsFromNet)
@@ -98,8 +89,9 @@ self.addEventListener('install', event => {
     })
   );
 
-  // Fetch all restaurants from server and puts them into the IDB
+  // Fetch all restaurants and reviews from server and puts them into the IDB
   refreshRestaurants(true);
+  refreshReviews();
 });
 
 // Clean cache after service worker updates
@@ -183,6 +175,35 @@ self.addEventListener('fetch', event => {
       refreshRestaurant(id);
       return;
     }
+    // Gets a specific restaurant reviews (if URL matches the exact regex)
+    else if (requestURL.pathname === '/reviews/' && requestURL.search.match(/^\?restaurant_id=\d+$/) && dbPromise) {
+      // Extract the restaurant id from the URL
+      const id = requestURL.search.substring(requestURL.search.lastIndexOf('=') + 1, requestURL.search.length);
+      console.log(`Getting reviews for restaurant with id: ${id} from IDB`);
+      event.respondWith(
+        dbPromise.then(db => {
+          const tx = db.transaction('reviews');
+          const store = tx.objectStore('reviews');
+          const index = store.index('restaurant_id');
+          return index.getAll(parseInt(id));
+        })
+        .catch(err => {
+          console.error(`Failed to retrive reviews for restaurant with id: ${id} from IDB`, err);
+        })
+        .then(reviews => {
+          if (reviews) {
+            return new Response(JSON.stringify(reviews), {
+              headers: {
+                'content-type': 'application/json;charset=UTF-8'
+              }
+            });
+          }
+          else return fetch(event.request);
+        })
+      );
+      refreshReviewsByRestaurantId(id);
+      return;
+    }
   }
   event.respondWith(
     caches.match(event.request).then(function(response) {
@@ -217,6 +238,31 @@ const refreshRestaurants = (firstSave) => {
 };
 
 /**
+ * Fetches the rest server for updating IDB with reviews
+ */
+const refreshReviews = () => {
+  console.log(`Fetching network to save reviews data`);
+  fetch(`${serverREST}/reviews`)
+  .then(response => response.json())
+  .then(reviews => {
+    dbPromise.then(db => {
+      const tx = db.transaction('reviews', 'readwrite');
+      const keyValStore = tx.objectStore('reviews');
+      if (reviews) {
+        for (let r of reviews) {
+          keyValStore.put(r);
+        }
+      }
+      return tx.complete;
+    }).then(() => {
+      console.log(`All reviews saved to IndexDB!`);
+    });
+  }).catch(err => {
+    console.warn(`Failed to save all reviews in IndexDB!`, err);
+  });
+};
+
+/**
  * Fetches the rest server for updating IDB with a specific restaurant
  */
 const refreshRestaurant = (id) => {
@@ -236,5 +282,30 @@ const refreshRestaurant = (id) => {
     });
   }).catch(err => {
     console.warn(`Failed to update restaurant with id: ${id} to IndexDB!`, err);
+  });
+};
+
+/**
+ * Fetches the rest server for updating IDB with reviews of a specific restaurant
+ */
+const refreshReviewsByRestaurantId = (id) => {
+  console.log(`Fetching network to update reviews for the restaurant with id: ${id}`);
+  fetch(`${serverREST}/reviews/?restaurant_id=${id}`)
+  .then(response => response.json())
+  .then(reviews => {
+    dbPromise.then(db => {
+      const tx = db.transaction('reviews', 'readwrite');
+      const keyValStore = tx.objectStore('reviews');
+      if (reviews) {
+        for (let r of reviews) {
+          keyValStore.put(r);
+        }
+      }
+      return tx.complete;
+    }).then(() => {
+      console.log(`Reviews for restaurant with id: ${id} updated to IndexDB!`);
+    });
+  }).catch(err => {
+    console.warn(`Failed to update reviews for restaurant with id: ${id} to IndexDB!`, err);
   });
 };
