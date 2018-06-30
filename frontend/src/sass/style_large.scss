@@ -52,8 +52,17 @@ footer {
 #no-results-warning {
   font-size: 30px;
 }
-
 /* ====================== Restaurant Details ====================== */
+#restaurant-header {
+  display: flex;
+  flex-wrap: wrap;
+}
+#restaurant-name {
+  width: calc(100% - 135px);
+}
+#restaurant-favorite {
+  margin-left: 10px;
+}
 #restaurant-container {
   padding: 20px 20px 15px;
   width: calc(50% - 40px);

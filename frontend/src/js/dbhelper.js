@@ -177,4 +177,18 @@ export default class DBHelper {
     marker.addTo(map);
     return marker;
   }
+
+  /**
+   * Toggle favorite flag on a restaurant.
+   */
+  static toggleFavoriteRestaurant(restaurant) {
+    const setFavoriteTo = !restaurant.is_favorite;
+    return fetch(`${DBHelper.DATABASE_URL}/${restaurant.id}/`, {
+      method: 'PUT',
+      body: JSON.stringify({is_favorite: setFavoriteTo})
+    })
+  }
+
+
+
 }

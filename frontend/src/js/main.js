@@ -217,6 +217,16 @@ const createRestaurantHTML = (restaurant) => {
   image.title = restaurant.name;
   li.append(image);
 
+  // favorite icon
+  if (restaurant.is_favorite) {
+    const favIcon = document.createElement('img');
+    favIcon.className = 'restaurant-favorite-img';
+    favIcon.src = './img/icons/favorite.png';
+    favIcon.alt = 'Favorite restaurant icon';
+    favIcon.title = 'The restaurant is marked as favorite';
+    li.append(favIcon);
+  }
+
   const wrapper = document.createElement('div');
   wrapper.className = 'wrapper';
   const name = document.createElement('h3');

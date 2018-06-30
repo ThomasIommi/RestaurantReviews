@@ -112,6 +112,16 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
 
+  const favButton = document.getElementById('restaurant-favorite');
+  const isFavorite = restaurant.is_favorite;
+  favButton.innerHTML = `${isFavorite 
+    ? '<span role="img" aria-label="">❌</span> Unfavorite' 
+    : '<span role="img" aria-label="">★</span> Favorite!'}`;
+  favButton.title = `${isFavorite
+    ? 'Remove from'
+    : 'Add to'} favorites`;
+  favButton.onclick = () => toggleFavorite(restaurant);
+
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 
@@ -235,4 +245,28 @@ const getParameterByName = (name, url) => {
   if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
+};
+
+/**
+ * Toggle favorite flag on a restaurant.
+ */
+const toggleFavorite = (restaurant = self.restaurant) => {
+  DBHelper.toggleFavoriteRestaurant(restaurant)
+  .then(response => response.json())
+  .then(updatedRestaurant => {
+    const isFavorite = updatedRestaurant.is_favorite;
+    console.info(`Restaurant ${isFavorite ? 'added to' : 'removed from'} favorites`);
+    // Updates toggle button
+    const favButton = document.getElementById('restaurant-favorite');
+    favButton.innerHTML = `${isFavorite
+      ? '<span role="img" aria-label="">❌</span> Unfavorite'
+      : '<span role="img" aria-label="">★</span> Favorite!'}`;
+    favButton.title = `${isFavorite
+      ? 'Remove from'
+      : 'Add to'} favorites`;
+    favButton.onclick = () => toggleFavorite(updatedRestaurant);
+  })
+  .catch(err => {
+    console.error('Impossible to add/remove restaurant to/from favorites!', err);
+  });
 };

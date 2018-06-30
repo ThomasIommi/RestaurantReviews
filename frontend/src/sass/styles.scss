@@ -234,6 +234,11 @@ header h1 a {
   margin: 0;
   width: 100%;
 }
+.restaurant-favorite-img {
+  position: absolute;
+  margin-left: -10px;
+  width: 100px;
+}
 #restaurants-list li h3 {
   color: #f18200;
   font-family: Arial,sans-serif;
@@ -297,6 +302,22 @@ header h1 a {
 }
 #restaurant-img {
   width: 100%;
+}
+#restaurant-favorite {
+  background-color: #ffa500;
+  border-radius: 5px;
+  border: none;
+  color: #fff;
+  display: inline-block;
+  font-size: 16px;
+  margin: 0 0 20px;
+  padding: 10px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
+  cursor: pointer;
+  height: 40px;
+  width: 125px;
 }
 #restaurant-inner-container {
   border: 1px solid #ccc;
@@ -413,7 +434,7 @@ table, td, th {
 }
 
 /* ====================== Focus Handling ====================== */
-#restaurants-list li a:focus, .filter-selects select:focus {
+#restaurants-list li a:focus, .filter-selects select:focus, button:focus {
   outline: 0;
   border-radius: 5px;
   box-shadow: 0 0 10px 5px #ea4335;
