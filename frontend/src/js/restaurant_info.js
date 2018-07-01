@@ -191,7 +191,7 @@ const createReviewHTML = (review) => {
   header.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = new Date(review.createdAt).toLocaleDateString();
+  date.innerHTML = review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'syncing...';
   header.appendChild(date);
 
   li.appendChild(header);
@@ -293,6 +293,20 @@ window.submitForm = (event, form) => {
     // We should never have this alert (because of HTML 'required')
     alert("Form seems invalid! Check all fields are required!");
   }
+  return false;
+};
+
+/**
+ * Reset form without removing the input hidden value of the restaurant_id
+ */
+window.resetForm = (event, form) => {
+  event.preventDefault();
+  const restaurant_id_el = form.elements['restaurant_id'];
+  const restaurant_id = parseInt(restaurant_id_el.value);
+  for (let element of form.elements) {
+    element.value = null;
+  }
+  restaurant_id_el.value = restaurant_id;
   return false;
 };
 

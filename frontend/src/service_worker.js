@@ -14,7 +14,7 @@ const dbPromise = idb.open('restaurants-db', 1, upgradeDb => {
       restaurantStore.createIndex('cuisine_type', 'cuisine_type');
     // more cases as version increases
     case 1:
-      const reviewStore = upgradeDb.createObjectStore('reviews', {keyPath: 'id'});
+      const reviewStore = upgradeDb.createObjectStore('reviews', {keyPath: 'id', autoIncrement:true});
       reviewStore.createIndex('restaurant_id', 'restaurant_id');
   }
 });
@@ -118,102 +118,198 @@ self.addEventListener('fetch', event => {
     return;
   }
   // Detect and trys to handle restaurants json requests with IDB.
-  if (requestURL.origin === serverREST) {
-    // All restaurants
-    if (requestURL.pathname === '/restaurants' && dbPromise) {
-      // Gets all restaurants from IDB and return them, then fetch the net for updates to save
-      // on IDB for future requests
-      console.log('Getting all restaurants from IDB');
-      event.respondWith(
-        dbPromise.then(db => {
-          const tx = db.transaction('restaurants');
-          const store = tx.objectStore('restaurants');
-          return store.getAll();
-        })
-        .catch(err => {
-          console.error('Failed to retrive restaurants from IDB', err);
-        })
-        .then(restaurants => {
-          if (restaurants) {
-            return new Response(JSON.stringify(restaurants), {
-              headers: {
-                'content-type': 'application/json;charset=UTF-8'
-              }
-            });
-          }
-          else return fetch(event.request);
-        })
-      );
-      refreshRestaurants(false);
-      return;
+  if (requestURL.origin === serverREST && dbPromise) {
+    let id;
+
+    //  --- GET requests handlers ---
+    if (event.request.method === 'GET') {
+      // All restaurants
+      if (requestURL.pathname === '/restaurants') {
+        // Gets all restaurants from IDB and return them, then fetch the net for updates to save
+        // on IDB for future requests
+        console.log('Getting all restaurants from IDB');
+        event.respondWith(
+          dbPromise.then(db => {
+            const tx = db.transaction('restaurants');
+            const store = tx.objectStore('restaurants');
+            return store.getAll();
+          })
+          .catch(err => {
+            console.error('Failed to retrive restaurants from IDB', err);
+          })
+          .then(restaurants => {
+            if (restaurants) {
+              return new Response(JSON.stringify(restaurants), {
+                headers: {
+                  'content-type': 'application/json;charset=UTF-8'
+                }
+              });
+            }
+            else return fetch(event.request);
+          })
+        );
+        refreshRestaurants(false);
+        return;
+      }
+      // Gets a specific restaurant (if URL matches the exact regex)
+      else if (requestURL.pathname.match(/^\/restaurants\/\d+$/)) {
+        // Extract the restaurant id from the URL
+        id = requestURL.pathname.substring(requestURL.pathname.lastIndexOf('/') + 1, requestURL.pathname.length);
+        console.log(`Getting restaurant with id: ${id} from IDB`);
+        event.respondWith(
+          dbPromise.then(db => {
+            const tx = db.transaction('restaurants');
+            const store = tx.objectStore('restaurants');
+            return store.get(parseInt(id));
+          })
+          .catch(err => {
+            console.error(`Failed to retrive restaurant with id: ${id} from IDB`, err);
+          })
+          .then(restaurant => {
+            if (restaurant) {
+              return new Response(JSON.stringify(restaurant), {
+                headers: {
+                  'content-type': 'application/json;charset=UTF-8'
+                }
+              });
+            }
+            else return fetch(event.request);
+          })
+        );
+        refreshRestaurant(id);
+        return;
+      }
+      // Gets a specific restaurant reviews (if URL matches the exact regex)
+      else if (requestURL.pathname === '/reviews/' && requestURL.search.match(/^\?restaurant_id=\d+$/)) {
+        // Extract the restaurant id from the URL
+        id = requestURL.search.substring(requestURL.search.lastIndexOf('=') + 1, requestURL.search.length);
+        console.log(`Getting reviews for restaurant with id: ${id} from IDB`);
+        event.respondWith(
+          dbPromise.then(db => {
+            const tx = db.transaction('reviews');
+            const store = tx.objectStore('reviews');
+            const index = store.index('restaurant_id');
+            return index.getAll(parseInt(id));
+          })
+          .catch(err => {
+            console.error(`Failed to retrive reviews for restaurant with id: ${id} from IDB`, err);
+          })
+          .then(reviews => {
+            if (reviews) {
+              return new Response(JSON.stringify(reviews), {
+                headers: {
+                  'content-type': 'application/json;charset=UTF-8'
+                }
+              });
+            }
+            else return fetch(event.request);
+          })
+        );
+        refreshReviewsByRestaurantId(id);
+        return;
+      }
     }
-    // Gets a specific restaurant (if URL matches the exact regex)
-    else if (requestURL.pathname.match(/^\/restaurants\/\d+$/) && dbPromise) {
-      // Extract the restaurant id from the URL
-      const id = requestURL.pathname.substring(requestURL.pathname.lastIndexOf('/') + 1, requestURL.pathname.length);
-      console.log(`Getting restaurant with id: ${id} from IDB`);
-      event.respondWith(
-        dbPromise.then(db => {
-          const tx = db.transaction('restaurants');
-          const store = tx.objectStore('restaurants');
-          return store.get(parseInt(id));
-        })
-        .catch(err => {
-          console.error(`Failed to retrive restaurant with id: ${id} from IDB`, err);
-        })
-        .then(restaurant => {
-          if (restaurant) {
-            return new Response(JSON.stringify(restaurant), {
-              headers: {
-                'content-type': 'application/json;charset=UTF-8'
-              }
-            });
-          }
-          else return fetch(event.request);
-        })
-      );
-      refreshRestaurant(id);
-      return;
+
+    // --- PUT request handlers ---
+    else if (event.request.method === 'PUT') {
+      // Favorite/unfavorite restaurant
+      if (requestURL.pathname.match(/^\/restaurants\/\d+\/$/)) {
+        // Extract the restaurant id from the URL
+        id = requestURL.pathname.split("/")[2];
+        // Try to do regular fetch, if it fails update IDB locally and respond anyway, then retry to sync server DB later
+        const clonedRq = event.request.clone();
+        event.respondWith(
+          fetch(event.request)
+          .catch(() => {
+            // Request failed, respond from cache and flag restaurant
+            return clonedRq.json()
+            .then(rqBody => {
+              const favorite = rqBody.is_favorite;
+              return dbPromise.then(db => {
+                const tx = db.transaction('restaurants');
+                const store = tx.objectStore('restaurants');
+                return store.get(parseInt(id));
+              })
+              .then(restaurant => {
+                if (restaurant) {
+                  // set changes and out_of_sync flag and update IDB
+                  restaurant.is_favorite = favorite;
+                  restaurant.out_of_sync = true;
+                  dbPromise.then(db => {
+                    const tx = db.transaction('restaurants', 'readwrite');
+                    const keyValStore = tx.objectStore('restaurants');
+                    keyValStore.put(restaurant);
+                    tx.complete;
+                  });
+                  // then return response
+                  return new Response(JSON.stringify(restaurant), {
+                    headers: {
+                      'content-type': 'application/json;charset=UTF-8'
+                    }
+                  });
+                } else {
+                  throw new Error("Empty restaurant!");
+                }
+              })
+              .catch(err => {
+                console.error(`Failed to retrive restaurant with id: ${id} from IDB`, err);
+              })
+            })
+          })
+        );
+        return;
+      }
     }
-    // Gets a specific restaurant reviews (if URL matches the exact regex)
-    else if (requestURL.pathname === '/reviews/' && requestURL.search.match(/^\?restaurant_id=\d+$/) && dbPromise) {
-      // Extract the restaurant id from the URL
-      const id = requestURL.search.substring(requestURL.search.lastIndexOf('=') + 1, requestURL.search.length);
-      console.log(`Getting reviews for restaurant with id: ${id} from IDB`);
-      event.respondWith(
-        dbPromise.then(db => {
-          const tx = db.transaction('reviews');
-          const store = tx.objectStore('reviews');
-          const index = store.index('restaurant_id');
-          return index.getAll(parseInt(id));
-        })
-        .catch(err => {
-          console.error(`Failed to retrive reviews for restaurant with id: ${id} from IDB`, err);
-        })
-        .then(reviews => {
-          if (reviews) {
-            return new Response(JSON.stringify(reviews), {
-              headers: {
-                'content-type': 'application/json;charset=UTF-8'
+
+    // --- POST request handlers
+    else if (event.request.method === 'POST') {
+      // Save reviews
+      if (requestURL.pathname.match(/^\/reviews\/$/)) {
+        // Try to do regular fetch, if it fails update IDB locally and respond anyway, then retry to sync server DB later
+        const clonedRq = event.request.clone();
+        event.respondWith(
+          fetch(event.request)
+          .catch(() => {
+            // Request failed, save partial data in cache and flag it
+            return clonedRq.json()
+            .then(review => {
+              if (review) {
+                // set changes and out_of_sync flag and update IDB
+                review.out_of_sync = true;
+                dbPromise.then(db => {
+                  const tx = db.transaction('reviews', 'readwrite');
+                  const keyValStore = tx.objectStore('reviews');
+                  keyValStore.put(review);
+                  tx.complete;
+                });
+                // then return response
+                return new Response(JSON.stringify(review), {
+                  headers: {
+                    'content-type': 'application/json;charset=UTF-8'
+                  }
+                });
+              } else {
+                throw new Error("Empty review!");
               }
-            });
-          }
-          else return fetch(event.request);
-        })
-      );
-      refreshReviewsByRestaurantId(id);
-      return;
+            })
+            .catch(err => {
+              console.error(`Failed to save partial review locally in IDB`, err);
+            })
+          })
+        );
+        return;
+      }
     }
   }
   event.respondWith(
-    caches.match(event.request).then(function(response) {
+    caches.match(event.request).then((response) => {
       return response || fetch(event.request);
     })
   );
 });
 
 /**
- * Fetches the rest server for updating IDB with restaurants
+ * Fetches the rest server for updating IDB with restaurants (without overriding is_favourite if out_of_sync)
  */
 const refreshRestaurants = (firstSave) => {
   console.log(`Fetching network to ${firstSave ? 'save' : 'update'} restaurants data`);
@@ -225,10 +321,23 @@ const refreshRestaurants = (firstSave) => {
       const keyValStore = tx.objectStore('restaurants');
       if (restaurants) {
         for (let r of restaurants) {
-          keyValStore.put(r);
+          if (!firstSave) {
+            // avoid is_favorite override
+            keyValStore.get(r.id)
+            .then(oldRestaurant => {
+              if (oldRestaurant && oldRestaurant.out_of_sync) {
+                r.is_favorite = oldRestaurant.is_favorite;
+                r.out_of_sync = true;
+              }
+              keyValStore.put(r);
+              return tx.complete;
+            })
+          } else {
+            keyValStore.put(r);
+            return tx.complete;
+          }
         }
       }
-      return tx.complete;
     }).then(() => {
       console.log(`All restaurants ${firstSave ? 'saved' : 'updated'} to IndexDB!`);
     });
@@ -263,7 +372,7 @@ const refreshReviews = () => {
 };
 
 /**
- * Fetches the rest server for updating IDB with a specific restaurant
+ * Fetches the rest server for updating IDB with a specific restaurant  (without overriding is_favourite if out_of_sync)
  */
 const refreshRestaurant = (id) => {
   console.log(`Fetching network to update restaurant with id: ${id}`);
@@ -274,9 +383,17 @@ const refreshRestaurant = (id) => {
       const tx = db.transaction('restaurants', 'readwrite');
       const keyValStore = tx.objectStore('restaurants');
       if (restaurant) {
-        keyValStore.put(restaurant);
+        // avoid is_favorite override
+        keyValStore.get(restaurant.id)
+        .then(oldRestaurant => {
+          if (oldRestaurant && oldRestaurant.out_of_sync) {
+            restaurant.is_favorite = oldRestaurant.is_favorite;
+            restaurant.out_of_sync = true;
+          }
+          keyValStore.put(restaurant);
+          return tx.complete;
+        })
       }
-      return tx.complete;
     }).then(() => {
       console.log(`Restaurants with id: ${id} updated to IndexDB!`);
     });

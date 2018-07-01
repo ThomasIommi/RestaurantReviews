@@ -63,7 +63,7 @@
 
     <section id="reviews-form">
       <h2>Add your review</h2>
-      <form id="add-review-form" onsubmit="submitForm(event, this);">
+      <form id="add-review-form" onsubmit="submitForm(event, this);" onreset="resetForm(event, this)">
         <div class="form-input">
           <label class="form-label" for="form-review-username">* Username:</label>
           <input id="form-review-username" type="text" name="name" required aria-required="true" />
