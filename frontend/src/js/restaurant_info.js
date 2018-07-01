@@ -1,5 +1,6 @@
 import DBHelper from './dbhelper';
 import L from 'leaflet';
+import DOMPurify from 'dompurify';
 
 // LEAFLET SETTINGS:
 
@@ -108,8 +109,8 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   const favButton = document.getElementById('restaurant-favorite');
   const isFavorite = restaurant.is_favorite;
   favButton.innerHTML = `${isFavorite 
-    ? '<span role="img" aria-label="">❌</span> Unfavorite' 
-    : '<span role="img" aria-label="">★</span> Favorite!'}`;
+    ? '<span role="img" aria-label="" aria-hidden="true">❌</span> Unfavorite' 
+    : '<span role="img" aria-label="" aria-hidden="true">★</span> Favorite!'}`;
   favButton.title = `${isFavorite
     ? 'Remove from'
     : 'Add to'} favorites`;
@@ -128,6 +129,10 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
+
+  // set restaurant_id input hidden for the review form
+  const inputHidden = document.getElementById('form-review-id');
+  inputHidden.value = restaurant.id;
 
   // fill operating hours
   if (restaurant.operating_hours) {
@@ -160,9 +165,6 @@ const fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hour
  */
 const fillReviewsHTML = (reviews = self.reviews) => {
   const container = document.getElementById('reviews-container');
-  const title = document.createElement('h2');
-  title.innerHTML = 'Reviews';
-  container.appendChild(title);
 
   if (!reviews) {
     const noReviews = document.createElement('p');
@@ -250,14 +252,66 @@ const toggleFavorite = (restaurant = self.restaurant) => {
     // Updates toggle button
     const favButton = document.getElementById('restaurant-favorite');
     favButton.innerHTML = `${isFavorite
-      ? '<span role="img" aria-label="">❌</span> Unfavorite'
-      : '<span role="img" aria-label="">★</span> Favorite!'}`;
+      ? '<span role="img" aria-label="" aria-hidden="true">❌</span> Unfavorite'
+      : '<span role="img" aria-label="" aria-hidden="true">★</span> Favorite!'}`;
     favButton.title = `${isFavorite
       ? 'Remove from'
       : 'Add to'} favorites`;
     favButton.onclick = () => toggleFavorite(updatedRestaurant);
   })
-  .catch(err => {
-    console.error('Impossible to add/remove restaurant to/from favorites!', err);
+  .catch(error => {
+    console.error('DBHelper.toggleFavoriteRestaurant() got an error:', error);
   });
+};
+
+/**
+ * Clear form
+ */
+window.clearForm = () => {
+  document.getElementById("add-review-form").reset();
+};
+
+/**
+ * Validate and handle the POST submit of the review form to the server
+ */
+window.submitForm = (event, form) => {
+  event.preventDefault();
+  const formJson = purifyAndValidateForm(form);
+  if (formJson) {
+    DBHelper.submitReviewForm(formJson)
+    .then(response => response.json())
+    .then(review => {
+      const ul = document.getElementById('reviews-list');
+      ul.appendChild(createReviewHTML(review));
+      console.info("New review added!");
+      form.reset();
+    })
+    .catch(error => {
+      console.error("DBHelper.submitReviewForm(): got an error:", error);
+    });
+  } else {
+    // We should never have this alert (because of HTML 'required')
+    alert("Form seems invalid! Check all fields are required!");
+  }
+  return false;
+};
+
+/**
+ * Purify form against XSS attacks and creates a JSON to send to server
+ */
+const purifyAndValidateForm = (form) => {
+  const restaurant_id_el = form.elements['restaurant_id']; // input hidden
+  const name_el = form.elements['name'];
+  const rating_el = form.elements['rating'];
+  const comments_el = form.elements['comments'];
+  const restaurant_id = parseInt(DOMPurify.sanitize(restaurant_id_el.value));
+  const name = DOMPurify.sanitize(name_el.value);
+  const rating = parseInt(DOMPurify.sanitize(rating_el.value));
+  const comments = DOMPurify.sanitize(comments_el.value);
+
+  if (!restaurant_id || !name || !rating || !comments)
+    return false;
+
+  const jsonObj = {restaurant_id, name, rating, comments};
+  return JSON.stringify(jsonObj);
 };

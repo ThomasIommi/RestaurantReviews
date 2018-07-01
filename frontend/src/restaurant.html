@@ -52,7 +52,36 @@
       </div>
     </section>
     <section id="reviews-container">
+      <div id="reviews-header">
+        <h2>Reviews</h2>
+        <a class="button" id="add-review" title="Add you own review of the restaurant" href="#reviews-form">
+          <span id="book" role="img" aria-label="" aria-hidden="true">🕮</span> Add review
+        </a>
+      </div>
       <ul id="reviews-list"></ul>
+    </section>
+
+    <section id="reviews-form">
+      <h2>Add your review</h2>
+      <form id="add-review-form" onsubmit="submitForm(event, this);">
+        <div class="form-input">
+          <label class="form-label" for="form-review-username">* Username:</label>
+          <input id="form-review-username" type="text" name="name" required aria-required="true" />
+        </div>
+        <div class="form-input">
+          <label class="form-label" for="form-review-text">* Comment:</label>
+          <textarea id="form-review-text" name="comments" required aria-required="true"></textarea>
+        </div>
+        <div class="form-input" id="form-rating">
+          <label class="form-label" for="form-review-rating">* Rating:</label>
+          <input id="form-review-rating" type="number" min="1" max="5" name="rating" required aria-required="true" />
+        </div>
+        <input id="form-review-id" class="input-hidden" type="number" name="restaurant_id" aria-hidden="true"/>
+        <div class="form-buttons">
+          <button type="submit" id="form-review-submit">Submit</button>
+          <button type="button" id="form-review-clear" onclick="clearForm();">Clear</button>
+        </div>
+      </form>
     </section>
   </main>
 
@@ -61,7 +90,6 @@
   </footer>
 
   <script type="application/javascript" src="js/bundles/restaurant_bundle.js"></script>
-  <!--<script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=initMap"></script>-->
 
 </body>
 </html>

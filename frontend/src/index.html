@@ -30,7 +30,7 @@
     </section>
     <section id="restaurant-list-container" tabindex="-1">
       <div class="filter-options">
-        <h2>Filter Results <span id="glass" role="img" aria-label="">🔎</span></h2>
+        <h2>Filter Results <span id="glass" role="img" aria-label="" aria-hidden="true">🔎</span></h2>
         <div class="filter-selects">
           <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()"
                   aria-label="filter by neighborhood" aria-controls="restaurants-list">
@@ -51,8 +51,6 @@
   </footer>
 
   <script type="application/javascript" charset="utf-8" src="js/bundles/main_bundle.js"></script>
-  <!--<script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=initMap"></script>-->
-
 
 </body>
 </html>

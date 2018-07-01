@@ -300,24 +300,11 @@ header h1 a {
   letter-spacing: 0;
   margin: 0 0 20px;
 }
+#restaurant-favorite {
+  width: 125px;
+}
 #restaurant-img {
   width: 100%;
-}
-#restaurant-favorite {
-  background-color: #ffa500;
-  border-radius: 5px;
-  border: none;
-  color: #fff;
-  display: inline-block;
-  font-size: 16px;
-  margin: 0 0 20px;
-  padding: 10px;
-  text-align: center;
-  text-decoration: none;
-  font-weight: 700;
-  cursor: pointer;
-  height: 40px;
-  width: 125px;
 }
 #restaurant-inner-container {
   border: 1px solid #ccc;
@@ -349,13 +336,13 @@ header h1 a {
   padding: 10px;
   width: calc(100% - 20px);
 }
-#restaurant-container, #reviews-container {
+#restaurant-container, #reviews-container, #reviews-form {
   border-bottom: 1px solid #d9d9d9;
   border-top: 1px solid #fff;
   padding: 20px 20px 60px;
   width: calc(100% - 40px);
 }
-#reviews-container h2 {
+#reviews-container h2, #reviews-form h2 {
   color: #f58500;
   font-family: 'Berkshire Swash', cursive;
   font-size: 2em;
@@ -378,6 +365,17 @@ header h1 a {
 }
 table, td, th {
   border: 1px solid #ddd;
+}
+#reviews-header {
+  display: flex;
+  flex-wrap: wrap;
+}
+#reviews-header > h2 {
+  width: calc(100% - 150px);
+}
+#add-review {
+  width: 120px;
+  margin-left: 10px;
 }
 #reviews-list {
   margin: 0;
@@ -434,7 +432,7 @@ table, td, th {
 }
 
 /* ====================== Focus Handling ====================== */
-#restaurants-list li a:focus, .filter-selects select:focus, button:focus {
+#restaurants-list li a:focus, .filter-selects select:focus, button:focus, a.button:focus, input:focus, textarea:focus {
   outline: 0;
   border-radius: 5px;
   box-shadow: 0 0 10px 5px #ea4335;
@@ -471,4 +469,68 @@ section {
   margin-top: -142px;
 }
 
+/* ====================== Review Form ====================== */
+form {
+  display: flex;
+  flex-wrap: wrap;
+}
+.form-input, .form-buttons {
+  margin: 10px 0 10px 0;
+  padding: 10px;
+}
+.form-input {
+  width: 100%;
+}
+#form-rating {
+  width: calc(100% - 180px);
+}
+.form-buttons {
+  text-align: right;
+  margin-top: 50px;
+}
+input[type=text], input[type=number], textarea {
+  padding: 15px 20px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font: inherit;
+  line-height: inherit;
+  display: block;
+}
+input[type=text], textarea {
+  width: 100%;
+}
+textarea {
+  resize: vertical;
+  min-height: 150px;
+}
+.form-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
+  color: #333;
+  line-height: 1.2;
+}
+.input-hidden {
+  display: none !important;
+}
 
+/* ====================== Generic ====================== */
+button, a.button {
+  background-color: #ffa500;
+  border-radius: 5px;
+  border: none;
+  color: #fff;
+  display: inline-block;
+  font-size: 16px;
+  margin: 0 0 20px;
+  padding: 10px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
+  cursor: pointer;
+  max-height: 40px;
+}
+a.button:visited, a.button:hover, a.button:active {
+  color: #fff;
+}

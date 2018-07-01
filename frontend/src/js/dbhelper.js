@@ -6,7 +6,7 @@ const port = 1337; // Change this to your server port
  * Common database helper functions.
  */
 export default class DBHelper {
-  
+
   /**
    * Database URL.
    * Change this to restaurants.json file location on your server.
@@ -172,6 +172,13 @@ export default class DBHelper {
   }
 
   /**
+   * Restaurant form action URL.
+   */
+  static formActionForRestaurant() {
+    return (`${DBHelper.DB_REVIEWS_URL}/`);
+  }
+
+  /**
    * Map marker for a restaurant.
    */
   static mapMarkerForRestaurant(restaurant, map) {
@@ -194,6 +201,16 @@ export default class DBHelper {
     return fetch(`${DBHelper.DB_RESTAURANTS_URL}/${restaurant.id}/`, {
       method: 'PUT',
       body: JSON.stringify({is_favorite: setFavoriteTo})
+    })
+  }
+
+  /**
+   * Send POST request for new review.
+   */
+  static submitReviewForm(json) {
+    return fetch(`${DBHelper.DB_REVIEWS_URL}/`, {
+      method: 'POST',
+      body: json
     })
   }
 }
