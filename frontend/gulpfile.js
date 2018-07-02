@@ -117,10 +117,10 @@ gulp.task('copy-imgs', () => {
 
 });
 
-// bundles js files for dev mode and copies them and the service_worker.js file into dist folder
+// bundles js files for dev mode and copies them into dist folder
 gulp.task('bundle-js-dev', ['bfy-main-dev', 'bfy-restaurant-dev', 'bfy-sw-dev']);
 
-// bundles js files for prod mode, copies them and uglify the service_worker.js file into dist folder
+// bundles js files for prod mode, copies them into dist folder
 gulp.task('bundle-js-prod', ['bfy-main-prod', 'bfy-restaurant-prod', 'bfy-sw-prod']);
 
 // makes a bundle with browserify and babelify for the main page without uglify minification

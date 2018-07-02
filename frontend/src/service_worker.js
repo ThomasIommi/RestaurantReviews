@@ -12,12 +12,18 @@ const dbPromise = idb.open('restaurants-db', 1, upgradeDb => {
       const restaurantStore = upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
       restaurantStore.createIndex('neighborhood', 'neighborhood');
       restaurantStore.createIndex('cuisine_type', 'cuisine_type');
-    // more cases as version increases
     case 1:
       const reviewStore = upgradeDb.createObjectStore('reviews', {keyPath: 'id', autoIncrement:true});
       reviewStore.createIndex('restaurant_id', 'restaurant_id');
+    // more cases as version increases
   }
 });
+
+// Start sync interval (15 seconds for testing purposes, maybe 30sec or 1min it's better?)
+const syncIntervalID = setInterval(() => {
+  console.info('Syncing...');
+  syncClientServer();
+}, 15000);
 
 // Install service worker
 self.addEventListener('install', event => {
@@ -212,14 +218,30 @@ self.addEventListener('fetch', event => {
 
     // --- PUT request handlers ---
     else if (event.request.method === 'PUT') {
-      // Favorite/unfavorite restaurant
+      // favorite/unfavorite restaurant
       if (requestURL.pathname.match(/^\/restaurants\/\d+\/$/)) {
-        // Extract the restaurant id from the URL
+        // extract the restaurant id from the URL
         id = requestURL.pathname.split("/")[2];
-        // Try to do regular fetch, if it fails update IDB locally and respond anyway, then retry to sync server DB later
+        // try to do regular fetch, if it fails update IDB locally and respond anyway, then retry to sync server DB later
+        // clone request to read its body
         const clonedRq = event.request.clone();
         event.respondWith(
           fetch(event.request)
+          .then(response => {
+            // clone response and update IDB
+            const clonedResponse = response.clone();
+            clonedResponse.json()
+            .then(updatedRestaurant => {
+              dbPromise.then(db => {
+                const tx = db.transaction('restaurants', 'readwrite');
+                const keyValStore = tx.objectStore('restaurants');
+                keyValStore.put(updatedRestaurant);
+                tx.complete;
+              });
+            });
+            // then return the response
+            return response;
+          })
           .catch(() => {
             // Request failed, respond from cache and flag restaurant
             return clonedRq.json()
@@ -265,12 +287,28 @@ self.addEventListener('fetch', event => {
     else if (event.request.method === 'POST') {
       // Save reviews
       if (requestURL.pathname.match(/^\/reviews\/$/)) {
-        // Try to do regular fetch, if it fails update IDB locally and respond anyway, then retry to sync server DB later
+        // try to do regular fetch, if it fails update IDB locally and respond anyway, then retry to sync server DB later
+        // clone request to read its body
         const clonedRq = event.request.clone();
         event.respondWith(
           fetch(event.request)
+          .then(response => {
+            // clone response and update IDB
+            const clonedResponse = response.clone();
+            clonedResponse.json()
+            .then(newReview => {
+              dbPromise.then(db => {
+                const tx = db.transaction('reviews', 'readwrite');
+                const keyValStore = tx.objectStore('reviews');
+                keyValStore.put(newReview);
+                tx.complete;
+              });
+            });
+            // then return the response
+            return response;
+          })
           .catch(() => {
-            // Request failed, save partial data in cache and flag it
+            // request failed, save partial data in cache and flag it
             return clonedRq.json()
             .then(review => {
               if (review) {
@@ -424,5 +462,78 @@ const refreshReviewsByRestaurantId = (id) => {
     });
   }).catch(err => {
     console.warn(`Failed to update reviews for restaurant with id: ${id} to IndexDB!`, err);
+  });
+};
+
+/**
+ * Function that check for out_of_sync entities and tryes to update them on the server
+ */
+const syncClientServer = () => {
+  if (dbPromise) {
+    syncRestaurant();
+    syncReviews();
+  }
+};
+
+/**
+ * Tries to sync restaurant to server
+ */
+const syncRestaurant = () => {
+  dbPromise.then(db => {
+    const tx = db.transaction('restaurants');
+    const store = tx.objectStore('restaurants');
+    store.getAll()
+    .then(restaurants => {
+      if (restaurants) {
+        for (let rest of restaurants) {
+          if (rest.out_of_sync) {
+            fetch(`${serverREST}/restaurants/${rest.id}/`, {
+              method: 'PUT',
+              body: JSON.stringify({is_favorite: rest.is_favorite})
+            })
+            .then(response => response.json())
+            .then(updatedRestaurant => {
+              const tx = db.transaction('restaurants', 'readwrite');
+              const store = tx.objectStore('restaurants');
+              store.put(updatedRestaurant);
+              console.info(`Restaurant of id: ${updatedRestaurant.id} synced with server!`);
+              return tx.complete;
+            })
+          }
+        }
+      }
+    });
+  });
+};
+
+/**
+ * Tries to sync reviews to server
+ */
+const syncReviews = () => {
+  dbPromise.then(db => {
+    const tx = db.transaction('reviews');
+    const store = tx.objectStore('reviews');
+    store.getAll()
+    .then(reviews => {
+      if (reviews) {
+        for (let rev of reviews) {
+          if (rev.out_of_sync) {
+            delete rev.out_of_sync;
+            fetch(`${serverREST}/reviews/`, {
+              method: 'POST',
+              body: JSON.stringify(rev)
+            })
+            .then(response => response.json())
+            .then(updatedReview => {
+              const tx = db.transaction('reviews', 'readwrite');
+              const store = tx.objectStore('reviews');
+              store.put(updatedReview);
+              console.info(`Review of id: ${updatedReview.id} synced with server!`);
+              return tx.complete;
+            })
+          }
+        }
+      }
+    });
   });
 };
