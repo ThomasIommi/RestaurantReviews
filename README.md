@@ -30,8 +30,27 @@ Finally, optimize the app to meet performance benchmarks made with Lighthouse:
 * Accessibility > 90
 * Progessive Web App > 90
 
-**NOTE FOR REVIEWERS**: As suggested in */frontend/resources/audits/* there are 2 screenshots of Lighthouse audits, one with
+**NOTE FOR REVIEWERS**: As suggested in */frontend/resources/audits/stage2/* there are 2 screenshots of Lighthouse audits, one with
 3G connection and CPU slowdown, the other in no throttling mode. BTW Thank you for the tips and tricks!
+
+## Stage 3
+
+In Stage Three, the goal is to add a form to allow users to create their own reviews: 
+The form includes the user’s name, the restaurant id, the user’s rating, and whatever comments he have. 
+Submitting the form should update the server when the user is online.
+
+If the user is not online, the app should notify the user that they are not connected, and save the users' data to submit automatically when re-connected. 
+In this case, the review should be deferred and sent to the server when connection is re-established (but the review should still be visible locally even before it gets to the server.)
+
+Users are also able to mark a restaurant as a favorite, this toggle is visible in the application.
+
+In addition to adding new features, the performance targets met in Stage Two have tightened. 
+* Performance > 90
+* Accessibility > 90
+* Progressive Web App > 90
+
+**NOTE FOR REVIEWERS**: As for Stage 2 in */frontend/resources/audits/stage3/* there are 4 screenshots of Lighthouse audits, made with
+different settings of network and cpu slowdown and caching active or not.
 
 ### Installation
 
@@ -52,6 +71,7 @@ it should install all the package and dependecies required for this app to be bu
 * [Gulp-uglify-es](https://www.npmjs.com/package/gulp-uglify-es)
 * [Gulp-autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer)
 * [Browser-sync](https://browsersync.io/)
+* [DOMPurify](https://github.com/cure53/DOMPurify)
 * etc...
 
 Finally there are some node script that can be lunched in order to build the app:
@@ -124,8 +144,8 @@ It also clean the cache every time the application is updated.
 
 Super useful cookbook on the subject by Jake Archibald's blog ([here](https://jakearchibald.com/2014/offline-cookbook/))
 
-###### CORS request
-Request from Cross Origin can't be cached in addAll() method even with mode: "no-cors" header. (Or I just failed at it! :D)
-It was needed to fetch the request (with the no-cors header) on the net and only then clone the response and cache that 
-instead.
+###### XSS protection note
+
+To protect versus XSS attacks there is an attempt to sanitize form inputs client side (with DOMPurify library), 
+although this is not enough and another validation should take place server side!
 
