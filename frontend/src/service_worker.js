@@ -155,6 +155,7 @@ self.addEventListener('fetch', event => {
           })
         );
         refreshRestaurants(false);
+        refreshReviews();
         return;
       }
       // Gets a specific restaurant (if URL matches the exact regex)
